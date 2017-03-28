@@ -1,8 +1,8 @@
-SRC:=*.C
+SOURCE:=*.c
 CC:=gcc
 REQUIREMENT:=-Wl,--start-group -lwiringPi -lpthread -ljpeg -Wl,--end-group
 
-app:$(SRC)
+app:$(SOURCE)
 	$(CC) $(REQUIREMENT) $^ -o $@
 rm:
-	-rm app *.bak
+	-rm -rf app *.bak
