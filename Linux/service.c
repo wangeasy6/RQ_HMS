@@ -56,9 +56,14 @@ printf("server listend\n");
 
 int send_data(const char *data)
 {
-	int len,l,ret;
-	len = l = strlen(data);
-	for(;len > 0;l = l - ret)
+	int len,ret;
+	len = strlen(data);
+
+#ifdef SEND_INFO
+	printf("%s\n",data);
+#endif
+
+	for(;len > 0;len = len - ret)
 	{
 		ret = write(connfd, data, strlen(data));
 		if (-1 == ret )
@@ -101,13 +106,13 @@ int service_run()
 					if (-1 == ret)
 					{
 						printf("data error!\n");
-						//break;
+						break;
 					}
 					//¿Í»§¶ËÍË³ö
 					if (0 == ret)
 					{
 						printf("user shutdown!\n");
-						//break;
+						break;
 					}
 				}
 			}

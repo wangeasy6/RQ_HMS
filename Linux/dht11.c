@@ -13,7 +13,9 @@ uint8 dht11_init()
 		return 0;  
 	}
 
+#ifdef PRINTF_SIGN
 	printf("Use WiringPi_GPIO%d to dht11!\n",dht11_Pin);
+#endif
 
 	return 1;
 }
@@ -80,17 +82,12 @@ void *dht11_run(void *arg)
 			   printf("TMP:%d.%d\n",(dht11_databuf>>8)&0xff,dht11_databuf&0xff);  
 			   */
 				memset(buf,0,sizeof(buf));
-				snprintf(buf,sizeof(buf),"%d,%d",(dht11_databuf>>24)&0xff,(dht11_databuf>>8)&0xff);
+				buf[0] = 'E';
+				snprintf(&buf[1],sizeof(buf),"%d,%d",(dht11_databuf>>24)&0xff,(dht11_databuf>>8)&0xff);
 				send_data(buf);
-				printf("%s\n",buf);
 			    dht11_databuf=0;
-			}  
-			else  
-			{
-				//printf("Sorry! Sensor dosent ans!\n");  
-				dht11_databuf=0;  
 			}
-			sleep(1);
 		}
+			sleep(1);
 	}
 }

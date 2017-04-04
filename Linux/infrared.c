@@ -6,28 +6,31 @@ extern int send_data(const char *data);
 int infrared_init()
 {
 	pinMode (infrared_Pin, INPUT);
+#ifdef PRINTF_SIGN
 	printf("Use WiringPi_GPIO%d to infrared!\n",infrared_Pin);
+#endif
 	return 1;
 }
 
 void *infrared_run(void *arg)
 {
-	static char buf[2] = {0};
+	static char buf[3] = {0};
+	buf[0] = 'I';
+	buf[2] = '\0';
 	while(1)
 	{
 		if(connfd != -1)
 		{
 			if( digitalRead(infrared_Pin) )
 			{
-				buf[0] = '1';
+				buf[1] = '1';
 				
 			}
 			else
 			{
-				buf[0] = '0';
+				buf[1] = '0';
 			}
 				send_data(buf);
-				printf("%s\n",buf);
 				sleep(1);
 		}
 	}

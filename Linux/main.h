@@ -1,6 +1,7 @@
 #ifndef __MAIN__
 #define __MAIN__
 
+#include "print_control.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>

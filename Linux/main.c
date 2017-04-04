@@ -19,14 +19,19 @@ int main(){
 		printf("Creat infrared failed\n");
 		exit(res);
 	}
+
+#ifdef PRINTF_SIGN
 	printf("Creat infrared seccess\n");
+#endif
 	
 	res = pthread_create(&dht11,NULL,dht11_run,(void*)1);
 	if(res != 0){
 		printf("Creat dht11_run failed\n");
 		exit(res);
 	}
+#ifdef PRINTF_SIGN
 	printf("Creat dht11_run seccess\n");
+#endif
 
 	service_run();
 
@@ -34,12 +39,16 @@ int main(){
 	void *thrd_ret;
 	res = pthread_join(infrared,&thrd_ret);
 	if(!res)
+#ifdef PRINTF_SIGN
 		printf("thread infrared exited\n");
+#endif
 	else
 		printf("thread infrared exit failed\n");
 	res = pthread_join(dht11,&thrd_ret);
 	if(!res)
+#ifdef PRINTF_SIGN
 		printf("thread dht11 exited\n");
+#endif
 	else
 		printf("thread dht11 exit failed\n");
 

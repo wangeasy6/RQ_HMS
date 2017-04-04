@@ -1,6 +1,8 @@
 #ifndef _CAMERA_
 #define _CAMERA_
 
+#include "print_control.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/ioctl.h>

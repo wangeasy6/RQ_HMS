@@ -1,3 +1,4 @@
+#include "print_control.h"
 #include <wiringPi.h>  
 #include <stdio.h>
 #include <string.h>

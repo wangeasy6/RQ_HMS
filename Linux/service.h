@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <semaphore.h>
 
-#define PRINTF_SIGN
+#include "print_control.h"
 
 typedef struct
 {

@@ -1,11 +1,12 @@
 //  
 //	dht11.h  
 //  
-
+#include "print_control.h"
 #include <wiringPi.h>  
 #include <stdio.h>  
-#include <stdlib.h>  
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
   
 typedef unsigned char uint8;
 typedef unsigned int  uint16;
