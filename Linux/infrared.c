@@ -6,6 +6,7 @@ extern int send_data(const char *data);
 int infrared_init()
 {
 	pinMode (infrared_Pin, INPUT);
+	printf("Use WiringPi_GPIO%d to infrared!\n",infrared_Pin);
 	return 1;
 }
 

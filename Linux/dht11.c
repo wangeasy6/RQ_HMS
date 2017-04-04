@@ -13,7 +13,7 @@ uint8 dht11_init()
 		return 0;  
 	}
 
-	printf("Use WringPi_GPIO1 to dht11!\n");
+	printf("Use WiringPi_GPIO%d to dht11!\n",dht11_Pin);
 
 	return 1;
 }

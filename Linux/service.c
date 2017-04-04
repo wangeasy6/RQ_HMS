@@ -84,17 +84,38 @@ int service_run()
 			break;
 			//continue;
 		}
-#ifdef PRINTF_SIGN
-	memset(buf,0,sizeof(buf));
-	printf("accept info: client addr is %s,port %d\n", \
-			inet_ntop(AF_INET,&cliaddr.sin_addr,buf,sizeof(buf)),\
-			ntohs(cliaddr.sin_port));
-#endif
 
-#ifdef PRINTF_SIGN
-		printf("connfd closed\n");
-		connfd = -1;
-#endif
+		#ifdef PRINTF_SIGN
+			memset(buf,0,sizeof(buf));
+			printf("accept info: client addr is %s,port %d\n", \
+					inet_ntop(AF_INET,&cliaddr.sin_addr,buf,sizeof(buf)),\
+					ntohs(cliaddr.sin_port));
+		#endif
+
+		while(1)
+			{
+				memset(buf,0,sizeof(buf));
+				int ret = recv(connfd, buf, sizeof(buf), 0);
+				{
+					//数据传输出错
+					if (-1 == ret)
+					{
+						printf("data error!\n");
+						//break;
+					}
+					//客户端退出
+					if (0 == ret)
+					{
+						printf("user shutdown!\n");
+						//break;
+					}
+				}
+			}
+
+		#ifdef PRINTF_SIGN
+			printf("connfd closed\n");
+			connfd = -1;
+		#endif
 	}
 	return 1;
 }
