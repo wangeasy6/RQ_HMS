@@ -1,10 +1,8 @@
 # RQ_HMS
 ### Made a home monitoring system with Raspberry Pi and QT.
 
-## two folders:
-
-*    /linux store the code on the Raspberry Pi.
-*	 /QT shore the code on the QT.
+* /linux store the code on the Raspberry Pi.
+* /QT shore the code on the QT.
 
 ## Raspberry Pi physical connection:
 
