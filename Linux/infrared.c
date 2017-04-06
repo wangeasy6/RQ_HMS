@@ -23,12 +23,11 @@ void *infrared_run(void *arg)
 		{
 			if( digitalRead(infrared_Pin) )
 			{
-				buf[1] = '1';
-				
+				buf[1] = '0';
 			}
 			else
 			{
-				buf[1] = '0';
+				buf[1] = '1';
 			}
 				send_data(buf);
 				sleep(1);

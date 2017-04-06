@@ -87,6 +87,10 @@ void *dht11_run(void *arg)
 				send_data(buf);
 			    dht11_databuf=0;
 			}
+			else
+			{
+				printf("read dht11 error!\n");
+			}
 		}
 			sleep(1);
 	}
