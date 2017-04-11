@@ -5,11 +5,13 @@ int main(){
 	DATA *data = (DATA *) malloc( sizeof(DATA) );
 	memset( data , 0, sizeof(DATA) );
 
-	if( !( dht11_init() && infrared_init() && service_init() ) )//camera_init();
+	if( !( dht11_init() && infrared_init() && service_init() ) )//camera_init(); && bee_init()
 	{
 		printf("init failed\n");
 		return(0);
 	}
+
+/******************************    init    *********************************/
 
 	pthread_t infrared,dht11;//camera,
 	int res;
@@ -32,8 +34,9 @@ int main(){
 #ifdef PRINTF_SIGN
 	printf("Creat dht11_run seccess\n");
 #endif
+/*************************    pthread_create    ***************************/
 
-	service_run();
+	service_run();								//service_run
 
 	//Ïß³ÌÍË³ö
 	void *thrd_ret;
