@@ -1,4 +1,23 @@
 # RQ_HMS
+##已完成：
+
+##未完成：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Made a home monitoring system with Raspberry Pi and QT.
 
 * /linux store the code on the Raspberry Pi.
