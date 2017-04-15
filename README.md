@@ -1,24 +1,37 @@
 # RQ_HMS
-##已完成：
+## 采用树莓派3B和QT做的一个智能家居监控系统
 
-##未完成：
+* /Linux 目录存放服务器（树莓派）的代码
+* /QT 目录存放客户端（PC）的代码
 
+## 物理连接
 
+* 树莓派 GPIO_1 连接 DHT11（使用 WiringPi库）
+* 树莓派 GPIO_4 连接 红外
+* 树莓派 GPIO_5 连接 蜂鸣器
+* 树莓派 USB2.0 连接 摄像头
+* 客户端 通过网线或无线连接树莓派（服务器端）
 
+### 已完成：
 
+* 读取dht11
+* 读取门禁
+* 多连接支持，pthread & mutex
 
+### 未完成：
 
+* 用户登录
+* 视频 + 优化
+* 报警声
+* 日志（双向传输 & 数据库）
+* 常用IP下拉栏 + IP输入格式限制
+* 录制视频 + 回看功能
+* 温湿度值方差校准
+* 短信 + 设置主机号码
+* UI美化
 
-
-
-
-
-
-
-
-
-
-### Made a home monitoring system with Raspberry Pi and QT.
+# RQ_HMS
+## Made a home monitoring system with Raspberry Pi and QT.
 
 * /linux store the code on the Raspberry Pi.
 * /QT shore the code on the QT.
@@ -30,8 +43,3 @@
 * Camera connected to USB.
 
 ## The system is still under development
-
-* Makefile , Use files := $(foreach n,$(names),$(n).o)
-* Linux , Logical upgrade
-* Linux , Add camera
-* QT , Communication and Interface
