@@ -1,7 +1,7 @@
 #ifndef __MAIN__
 #define __MAIN__
 
-#include "print_control.h"
+#include "sharing_data.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +10,12 @@
 #include "service.h"
 //#include "camera.h"
 
-#define STUTAS_sem
+enum __DEV
+{
+	infrared = 0,
+	dht11,
+	bee,
+	camera,
+};
 
 #endif

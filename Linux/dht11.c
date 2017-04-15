@@ -72,26 +72,24 @@ void *dht11_run(void *arg)
 {
 	static char buf[8] = {0};
 	while(1){
-		if(connfd != -1)
-		{
-			if( readSensorData() )  
-			{  
-				/*
-			   printf("Congratulations ! Sensor data read ok!\n");  
-			   printf("RH:%d.%d\n",(dht11_databuf>>24)&0xff,(dht11_databuf>>16)&0xff);   
-			   printf("TMP:%d.%d\n",(dht11_databuf>>8)&0xff,dht11_databuf&0xff);  
-			   */
-				memset(buf,0,sizeof(buf));
-				buf[0] = 'E';
-				snprintf(&buf[1],sizeof(buf),"%d,%d",(dht11_databuf>>24)&0xff,(dht11_databuf>>8)&0xff);
-				send_data(buf);
-			    dht11_databuf=0;
-			}
-			else
-			{
-				printf("read dht11 error!\n");
-			}
+		if( readSensorData() )  
+		{  
+			/*
+			  printf("Congratulations ! Sensor data read ok!\n");  
+			  printf("RH:%d.%d\n",(dht11_databuf>>24)&0xff,(dht11_databuf>>16)&0xff);   
+			  printf("TMP:%d.%d\n",(dht11_databuf>>8)&0xff,dht11_databuf&0xff);  
+			*/
+			memset(buf,0,sizeof(buf));
+			buf[0] = 'E';
+			snprintf(&buf[1],sizeof(buf),"%d,%d",(dht11_databuf>>24)&0xff,(dht11_databuf>>8)&0xff);
+			send_data(buf);
+			dht11_databuf=0;
 		}
-			sleep(1);
+		else
+		{
+			printf("read dht11 error!\n");
+		}
+		sleep(1);
 	}
+	pthread_exit(NULL);
 }

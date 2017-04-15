@@ -1,6 +1,5 @@
 #include "infrared.h"
 
-extern int connfd;
 extern int send_data(const char *data);
 
 int infrared_init()
@@ -19,18 +18,16 @@ void *infrared_run(void *arg)
 	buf[2] = '\0';
 	while(1)
 	{
-		if(connfd != -1)
+		if( digitalRead(infrared_Pin) )
 		{
-			if( digitalRead(infrared_Pin) )
-			{
-				buf[1] = '0';
-			}
-			else
-			{
-				buf[1] = '1';
-			}
-				send_data(buf);
-				sleep(1);
+			buf[1] = '0';
 		}
+		else
+		{
+			buf[1] = '1';
+		}
+			send_data(buf);
+			sleep(1);
 	}
+	pthread_exit(NULL);
 }

@@ -2,6 +2,7 @@
 
 rgb_buffers rgb_buf;
 extern int send_data(const char *data);
+extern SHARED *g_data;
 
 static cap_abilities(__u32 capabilities)
 {
@@ -332,5 +333,5 @@ void *camera_run(void *arg)
 	}
 
 	jpeg_destroy_compress(&jinfo.cinfo);
-	return 0;
+	pthread_exit(NULL);
 }

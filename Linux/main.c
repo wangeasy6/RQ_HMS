@@ -1,35 +1,41 @@
 #include "main.h"
+SHARED g_data;
+static int data_init()
+{
+	printf("addr:%p,",&g_data);
+	int i;
+	for(i = 0;i < MAX_THREAD;i++)
+		g_data.status[i] = UN_USE;
+	return SECCESS;
+}
 
 int main(){
+	
 	//uint8 send_pic[250*1024]={0};
-	DATA *data = (DATA *) malloc( sizeof(DATA) );
-	memset( data , 0, sizeof(DATA) );
 
-	if( !( dht11_init() && infrared_init() && service_init() ) )//camera_init(); && bee_init()
+	if( !( data_init() && dht11_init() && infrared_init() && service_init() ) )//camera_init(); && bee_init()
 	{
 		printf("init failed\n");
 		return(0);
 	}
 
+
 /******************************    init    *********************************/
 
-	pthread_t infrared,dht11;//camera,
-	int res;
+	pthread_t external_device[4];		//pthread_t infrared,dht11;camera,
 
-	res = pthread_create(&infrared,NULL,infrared_run,(void*)1);
-	if(res != 0){
+	if( pthread_create(&external_device[infrared],NULL,infrared_run,(void*)1) != 0 ){
 		printf("Creat infrared failed\n");
-		exit(res);
+		exit(0);
 	}
 
 #ifdef PRINTF_SIGN
 	printf("Creat infrared seccess\n");
 #endif
 	
-	res = pthread_create(&dht11,NULL,dht11_run,(void*)1);
-	if(res != 0){
+	if( pthread_create(&external_device[dht11],NULL,dht11_run,(void*)1) != 0 ){
 		printf("Creat dht11_run failed\n");
-		exit(res);
+		exit(0);
 	}
 #ifdef PRINTF_SIGN
 	printf("Creat dht11_run seccess\n");
@@ -40,15 +46,13 @@ int main(){
 
 	//Ïß³ÌÍË³ö
 	void *thrd_ret;
-	res = pthread_join(infrared,&thrd_ret);
-	if(!res)
+	if(!pthread_join(external_device[infrared],&thrd_ret) )
 #ifdef PRINTF_SIGN
 		printf("thread infrared exited\n");
 #endif
 	else
 		printf("thread infrared exit failed\n");
-	res = pthread_join(dht11,&thrd_ret);
-	if(!res)
+	if(!pthread_join(external_device[dht11],&thrd_ret) )
 #ifdef PRINTF_SIGN
 		printf("thread dht11 exited\n");
 #endif

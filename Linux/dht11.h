@@ -1,7 +1,7 @@
-//  
-//	dht11.h  
-//  
-#include "print_control.h"
+#ifndef __DHT11__
+#define __DHT11__
+
+#include "sharing_data.h"
 #include <wiringPi.h>  
 #include <stdio.h>  
 #include <stdlib.h>
@@ -20,3 +20,5 @@ uint32 dht11_databuf;
 uint8 dht11_init(void);
 uint8 readSensorData(void);
 void *dht11_run();
+
+#endif
