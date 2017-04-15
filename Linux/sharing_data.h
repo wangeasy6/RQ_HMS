@@ -9,7 +9,7 @@
 #define UN_USE 0
 
 #define PRINTF_SIGN
-#define SEND_INFO
+//#define SEND_INFO
 
 #define MAX_THREAD 10
 #define DEV_NUM 4

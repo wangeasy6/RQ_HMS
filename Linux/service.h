@@ -12,14 +12,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <semaphore.h>
+#include <pthread.h>
 
-#include "print_control.h"
-
-typedef struct
-{
-	char send_info[8];
-	int connfd;
-
-}DATA;
+#include "sharing_data.h"
 
 #endif
