@@ -17,6 +17,7 @@
 * 读取dht11
 * 读取门禁
 * 多连接支持，pthread & mutex
+* QT基本界面完成
 
 ### 未完成：
 
@@ -29,6 +30,12 @@
 * 温湿度值方差校准
 * 短信 + 设置主机号码
 * UI美化
+
+## 可升级
+
+* 红外传感器受环境光影响，可替换为微波感应开关
+* USB摄像头换为专业摄像头，使采集点变多，且传输距离更远
+* app客户端
 
 # RQ_HMS
 ## Made a home monitoring system with Raspberry Pi and QT.
