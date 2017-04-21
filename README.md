@@ -37,6 +37,10 @@
 * USB摄像头换为专业摄像头，使采集点变多，且传输距离更远
 * app客户端
 
+## BUG
+
+* 数据加锁
+
 # RQ_HMS
 ## Made a home monitoring system with Raspberry Pi and QT.
 
