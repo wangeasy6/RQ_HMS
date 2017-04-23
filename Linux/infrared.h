@@ -2,6 +2,7 @@
 #define __INFR__
 
 #include "sharing_data.h"
+#include "bee.h"
 #include <wiringPi.h>  
 #include <stdio.h>
 #include <string.h>

@@ -20,10 +20,12 @@ void *infrared_run(void *arg)
 	{
 		if( digitalRead(infrared_Pin) )
 		{
+			bee_stop();
 			buf[1] = '0';
 		}
-		else
+		else				//somebody broken in
 		{
+			bee_start();
 			buf[1] = '1';
 		}
 			send_data(buf);

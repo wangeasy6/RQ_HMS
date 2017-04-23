@@ -13,7 +13,7 @@ int main(){
 	
 	//uint8 send_pic[250*1024]={0};
 
-	if( !( data_init() && dht11_init() && infrared_init() && service_init() ) )//camera_init(); && bee_init()
+	if( !( data_init() && dht11_init() && infrared_init() && service_init() && bee_init() ) )//camera_init(); && bee_init()
 	{
 		printf("init failed\n");
 		return(0);
@@ -23,6 +23,15 @@ int main(){
 /******************************    init    *********************************/
 
 	pthread_t external_device[4];		//pthread_t infrared,dht11;camera,
+	
+	if( pthread_create(&external_device[bee],NULL,bee_run,(void*)1) != 0 ){
+		printf("Creat bee failed\n");
+		exit(0);
+	}
+
+#ifdef PRINTF_SIGN
+	printf("Creat bee seccess\n");
+#endif
 
 	if( pthread_create(&external_device[infrared],NULL,infrared_run,(void*)1) != 0 ){
 		printf("Creat infrared failed\n");
@@ -46,6 +55,12 @@ int main(){
 
 	//Ïß³ÌÍË³ö
 	void *thrd_ret;
+	if(!pthread_join(external_device[bee],&thrd_ret) )
+#ifdef PRINTF_SIGN
+		printf("thread bee exited\n");
+#endif
+	else
+		printf("thread bee exit failed\n");
 	if(!pthread_join(external_device[infrared],&thrd_ret) )
 #ifdef PRINTF_SIGN
 		printf("thread infrared exited\n");
