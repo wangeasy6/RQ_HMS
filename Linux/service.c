@@ -70,6 +70,7 @@ int send_data(const char *data)
 				pthread_mutex_lock(&g_data.mutex);
 				ret = write(g_data.connfd[i], data + pos, strlen(data));
 				pthread_mutex_unlock(&g_data.mutex);
+				
 				if (-1 == ret )
 				{
 					perror("server->write");
@@ -109,7 +110,9 @@ static int get_node()
 
 static int free_node(int index)
 {
+	pthread_mutex_lock(&g_data.mutex);
 	g_data.status[index] = UN_USE;
+	pthread_mutex_unlock(&g_data.mutex);
 	printf("connfd index:%d Out\n",index,__LINE__);
 	return SECCESS;
 }
@@ -124,6 +127,7 @@ void *connect_process(void *arg)
 	while(1)
 	{
 		memset(buf,0,sizeof(buf));
+		
 		int ret = recv(g_data.connfd[index], buf, sizeof(buf), 0);
 		{
 			//数据传输出错
@@ -181,7 +185,9 @@ int service_run()
 		if ( pthread_create(&newthread , NULL, (void *)connect_process, (void *)&g_data.connfd[index]) )
             perror("connect pthread_create");
 		else
+		{
 			g_data.status[index] = USED;
+		}
 	}
 	
 	pthread_mutex_destroy(&g_data.mutex);

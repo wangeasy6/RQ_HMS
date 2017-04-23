@@ -38,9 +38,6 @@
 * 升级报警器
 * app客户端
 
-## BUG
-
-* 数据加锁
 
 # RQ_HMS
 ## Made a home monitoring system with Raspberry Pi and QT.
