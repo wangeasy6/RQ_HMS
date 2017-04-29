@@ -122,8 +122,8 @@ void *connect_process(void *arg)
 	char buf[1024];
 	int index = (int*)arg - g_data.connfd;	
 	int ret;
+	reset_status();
 	printf("connfd index:%d In\n",index);
-	
 	while(1)
 	{
 		memset(buf,0,sizeof(buf));
