@@ -1,5 +1,6 @@
 #include "service.h"
 
+#define Max_Send_Length 1024
 unsigned short int PORT = 9999;
 static int socket_fd;
 extern SHARED g_data;
@@ -14,7 +15,7 @@ int service_init()
 	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd == -1) {
 		perror("server->socket:");
-		return 0;
+		return SECCESS;
 	}
 
 #ifdef PRINTF_SIGN
@@ -55,20 +56,21 @@ printf("server listend\n");
 	return 1;
 }
 
-int send_data(const char *data)
+int send_data(const char *data,const unsigned int length)
 {
-	static int LEN,len,ret,pos,i;
-	LEN = strlen(data);
+	static int LEN,len,ret,pos,i,test;
+	static char send_buf[Max_Send_Length] = {0};
+	LEN = length;
 
 	for(i = 0; i < MAX_THREAD ; i++)
 	{
 		if(g_data.status[i] != UN_USE)
 		{
-			len = LEN;
-			for(pos = 0;len > 0;len = len - ret)
+			if ( LEN < 1024 )
 			{
+				printf("send_connfd:%d ,%s\n",i,data);
 				pthread_mutex_lock(&g_data.mutex);
-				ret = write(g_data.connfd[i], data + pos, strlen(data));
+				ret = write(g_data.connfd[i], data, strlen(data));
 				pthread_mutex_unlock(&g_data.mutex);
 				
 				if (-1 == ret )
@@ -76,12 +78,53 @@ int send_data(const char *data)
 					perror("server->write");
 					return FAILED;
 				}
-				pos += ret;
+			}
+			else
+			{
+			if(test == 1)
+			continue;
+			test = 1;
+			
+				char header[10] = {0};
+				printf("send pic,size:%d\n",LEN);
+				len = LEN;
+				snprintf(header, sizeof(header), "H%d", LEN);
+				ret = write(g_data.connfd[i], header, sizeof(header));
+				printf("sizeof(send_buf):%d\n",sizeof(send_buf+1));
+				for(pos = 0,ret = 0;len > 0;len = len - ret)
+				{/*
+					memset(send_buf, 0, sizeof(send_buf));
+					send_buf[0] = 'B';
+					if( Max_Send_Length-1 <= len )
+					{
+						memcpy(send_buf+1, data+pos,Max_Send_Length-1);
+						pthread_mutex_lock(&g_data.mutex);
+						ret = write(g_data.connfd[i], send_buf, sizeof(send_buf) );
+						pthread_mutex_unlock(&g_data.mutex);
+					}
+					else
+					{
+						memcpy(send_buf+1, data+pos,len);
+						pthread_mutex_lock(&g_data.mutex);
+						ret = write(g_data.connfd[i], send_buf, len+1 );
+						pthread_mutex_unlock(&g_data.mutex);
+					}
+					//ret = write( g_data.connfd[i], data+pos, len);
+					*/
+					ret = write( g_data.connfd[i], data+pos, len);
+					if (-1 == ret )
+					{
+						perror("server->write");
+						return FAILED;
+					}
+					printf("%c. len:%d  ret:%d  pos:%d \r\n",*send_buf,len,ret,pos);
+					//ret -= 1;
+					pos += ret;
+				}
+				
+				printf("len:%d  ret:%d  pos:%d \n",len,ret,pos);
 			}
 
-			#ifdef SEND_INFO
-				printf("send_connfd:%d ,%s\n",i,data);
-			#endif
 		}
 		else
 			continue;
@@ -157,7 +200,7 @@ int service_run()
 	char buf[1024];
 	pthread_t newthread;
 	static int index;
-
+	print_i("service is running\r\n");
 	while (1) {
 		index = get_node();
 		if ( index == FAILED )
@@ -166,7 +209,7 @@ int service_run()
 		}
 		addrlen = sizeof(struct sockaddr_in);
 		memset(&cliaddr, 0, sizeof(struct sockaddr_in));
-
+		
 		g_data.connfd[index] = accept(socket_fd, (struct sockaddr *)&cliaddr, &addrlen);
 		if (g_data.connfd[index] == -1) {
 			perror("accept error");

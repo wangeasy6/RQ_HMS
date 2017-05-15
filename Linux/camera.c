@@ -1,7 +1,9 @@
 #include "camera.h"
 
+int cam_fd;
+
 rgb_buffers rgb_buf;
-extern int send_data(const char *data);
+extern int send_data(const char *data,const unsigned int length);
 extern SHARED *g_data;
 
 static cap_abilities(__u32 capabilities)
@@ -32,11 +34,10 @@ static cap_abilities(__u32 capabilities)
 int camera_init(const char *devpath, unsigned int *width, unsigned int *height, int *size )
 {
 	F_STR;
-	int cam_fd;
 	cam_fd = open(devpath, O_RDWR);
 	if(cam_fd == -1){
 		perror("dev open :\n");
-		return -1;
+		return FAILED;
 	}
 	
 	
@@ -44,7 +45,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	struct v4l2_capability cap;
 	if(ioctl(cam_fd, VIDIOC_QUERYCAP, &cap) < 0){
 		perror("ioctl");
-		exit(-1);
+		return FAILED;
 	}
 	printf("\nDriver Info:\nDriverName: %s\nCard Name: %s\nBus info: %s\nDriverVersion: %u.%u.%u\n",
 		cap.driver, cap.card, cap.bus_info, (cap.version>>16)&0xFF, (cap.version>>8)&0xFF, cap.version&0xFF);
@@ -79,7 +80,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	req.memory	= V4L2_MEMORY_MMAP;
 	
 	if(ioctl(cam_fd, VIDIOC_REQBUFS, &req) == -1){
-		return -1;
+		return FAILED;
 	}
 
 	//获取并记录缓存的物理空间
@@ -96,7 +97,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 		
 		//映射
 		if(ioctl(cam_fd, VIDIOC_QUERYBUF, &buf) == -1){	
-			return -1;
+			return FAILED;
 		}
 		
 		buffers[numBufs].length = buf.length;
@@ -104,14 +105,14 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 								MAP_SHARED, cam_fd, buf.m.offset);
 		
 		if(buffers[numBufs].start == MAP_FAILED){
-			return -1;
+			return FAILED;
 		}
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory = V4L2_MEMORY_MMAP;
 		
 		//放入缓存队列
 		if(ioctl(cam_fd, VIDIOC_QBUF, &buf) == -1){
-			return -1;
+			return FAILED;
 		}
 	}
 	
@@ -120,29 +121,26 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	*size = buffers[0].length;
 	
 	F_END;
-	return cam_fd;
+	return SECCESS;
 	
 }
 
 int camera_start(int fd)
 {
-	F_STR;
 	int ret;
 	enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
 	ret = ioctl(fd, VIDIOC_STREAMON, &type);
 	if (ret == -1) {
-		return -1;
+		return FAILED;
 	}
 	
-	F_END;
-	return 0;
+	return SECCESS;
 }
 
 ///JPEG写入2.c
 int camera_jpeg_gather(char *buffers,int len)
 {
-	F_STR;
 	FILE *fp;
     if((fp=fopen("./capture.jpg","w+"))==NULL)
 	{
@@ -151,14 +149,12 @@ int camera_jpeg_gather(char *buffers,int len)
 	}
 	fwrite(buffers,len,1,fp);
 	fclose(fp);
-	F_END;
 	return 0;
 }
 
 //YUYV转RGB
 void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int bps)
 {
-	F_STR;
 	unsigned int i;
 	int y1, y2, u, v;
 	unsigned char *src = yuv;
@@ -184,7 +180,6 @@ void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int
 		}
 		break;
 	}
-	F_END;
 }
 
 
@@ -194,7 +189,6 @@ void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int
 //RGB转JPEG
 int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned int height, unsigned int bpp, int quality)
 {	
-	F_STR;
 //RGB转JPEG初始化
 	memset(&jinfo, 0, sizeof(struct jpeg_mgr_info));
 	jinfo.cinfo.err = jpeg_std_error(&jinfo.jerr);
@@ -222,14 +216,12 @@ int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned 
 //RGB转JPEG退出
 	jpeg_finish_compress(&jinfo.cinfo);
 	//EOR
-	F_END;
 	return (jinfo.written);
 }
 
 //RGB转BMP写入3.bmp
 void savebmp(char * pdata, char * bmp_file, int width, int height )  
 {   
-	F_STR;
 	//分别为rgb数据，要保存的bmp文件名，图片长宽  
        int size = width*height*3*sizeof(char); // 每个像素点3个字节  
        // 位图第一部分，文件信息  
@@ -269,7 +261,6 @@ void savebmp(char * pdata, char * bmp_file, int width, int height )
        fwrite(pdata,size,1,fp);  
        fclose( fp );
 	   //EOR
-	   F_END;
 } 
 
 	/*
@@ -287,31 +278,35 @@ void *camera_run(void *arg)
 	int size;
 	jpeg_buffers jpeg_buf;
 
-	int camFd = camera_init(DEV_PATH, &width, &height, &size); 
-	if(camFd == -1)
+	ret = camera_init(DEV_PATH, &width, &height, &size); 
+	if( FAILED == ret)
 	{
 		perror("camera_init failed\n");
 		pthread_exit(NULL);
 	}
 
-	ret = camera_start(camFd);
-	if(-1 == ret)
+	ret = camera_start(cam_fd);
+	if( FAILED == ret)
 	{
 		perror("camera_start");
-		close(camFd);
+		close(cam_fd);
 		pthread_exit(NULL);
 	}
 
 	buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;  
 	buf.memory = V4L2_MEMORY_MMAP;
-	int i=0;
-	for(;i<1;i++)
+#if 0
+	int i = 0;
+	for(;i<10;i++)
+#else
+	while(1)
+#endif
 	{
-		ret = ioctl (camFd,VIDIOC_DQBUF, &buf); 
-		if(-1 == ret)
+		ret = ioctl (cam_fd, VIDIOC_DQBUF, &buf); 
+		if( -1 == ret)
 		{
 			perror("VIDIOC_DQBUF\n");
-			close(camFd);
+			close(cam_fd);
 			pthread_exit(NULL);
 		}
 		
@@ -321,7 +316,18 @@ void *camera_run(void *arg)
 		jpeg_buf.length = convert_rgb_to_jpg_work(rgb_buf.buf,jpeg_buf.buf,WIDTH,HIGHT,24,100);	
 		
 		
-		camera_jpeg_gather(jpeg_buf.buf,jpeg_buf.length);
+		if( jpeg_buf.length < 2000 )
+		{
+			print_e( "jpeg_buf is wrong\r\n" );
+			ioctl (cam_fd, VIDIOC_QBUF,&buf);
+			continue;
+		}
+		else
+		{
+			//camera_jpeg_gather(jpeg_buf.buf,jpeg_buf.length);
+			send_data( jpeg_buf.buf, jpeg_buf.length);
+			//printf("send jpeg_buf,size:%d\n",jpeg_buf.length);
+		}
 		
 #ifdef STDOUT
 	printf("%d\n", temp);
@@ -329,7 +335,7 @@ void *camera_run(void *arg)
 #endif
 		//process_image(buffers[buf.index].start);
 		// close(buffer_store);
-		ioctl (camFd, VIDIOC_QBUF,&buf);
+		ioctl (cam_fd, VIDIOC_QBUF,&buf);
 	}
 
 	jpeg_destroy_compress(&jinfo.cinfo);

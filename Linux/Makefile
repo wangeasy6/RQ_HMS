@@ -1,4 +1,4 @@
-Files := infrared dht11 service bee main
+Files := infrared dht11 service bee main camera
 SOURCE := $(foreach n,$(Files),$(n).o)
 CC := gcc
 
@@ -6,6 +6,9 @@ REQUIREMENT:=-Wl,--start-group -lwiringPi -lpthread -ljpeg -Wl,--end-group
 
 app:$(SOURCE)
 	$(CC) $^ -o $@ $(REQUIREMENT)
+
+camera.o:camera.c camera.h
+	$(CC) -c camera.c
 
 bee.o : bee.c bee.h
 	$(CC) -c bee.c

@@ -245,4 +245,6 @@ int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned 
 //RGB×ªBMPÐ´Èë3.bmp
 void savebmp(char * pdata, char * bmp_file, int width, int height );
 
+void *camera_run(void *arg);
+
 #endif

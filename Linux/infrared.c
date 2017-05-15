@@ -2,7 +2,7 @@
 
 int status = -1;
 pthread_mutex_t infrared_mutex;
-extern int send_data(const char *data);
+extern int send_data(const char *data,const unsigned int length);
 
 int infrared_init()
 {
@@ -50,7 +50,7 @@ void *infrared_run(void *arg)
 			bee_start();
 			buf[1] = '1';
 		}
-		send_data(buf);
+		send_data(buf, strlen(buf));
 		pthread_mutex_lock(&infrared_mutex);
 		status = read_data;
 		pthread_mutex_unlock(&infrared_mutex);

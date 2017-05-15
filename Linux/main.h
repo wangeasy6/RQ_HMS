@@ -6,7 +6,7 @@
 #include "infrared.h"
 #include "service.h"
 #include "bee.h"
-//#include "camera.h"
+#include "camera.h"
 
 #include <pthread.h>
 #include <stdlib.h>

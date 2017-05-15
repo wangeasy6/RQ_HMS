@@ -4,7 +4,7 @@
 #include "dht11.h"
 
 extern int connfd;
-extern int send_data(const char *data);
+extern int send_data(const char *data,const uint16 length);
 
 uint32 dht11_databuf; 
 uint16 temp_threshold = 45;
@@ -114,6 +114,7 @@ static uint8 verify_value(uint8 num)
 void *dht11_run(void *arg)
 {
 	static char buf[8] = {0};
+	buf[0] = 'E';
 	while(1){
 		if( readSensorData() == SECCESS)  
 		{  
@@ -135,16 +136,15 @@ void *dht11_run(void *arg)
 				bee_stop();
 			}
 			
-			memset(buf,0,sizeof(buf));
-			buf[0] = 'E';
+			memset(buf + 1, 0, sizeof(buf)-1);
 			snprintf(&buf[1],sizeof(buf),"%d,%d",(dht11_databuf>>24)&0xff,(dht11_databuf>>8)&0xff);
-			send_data(buf);
+			send_data(buf, sizeof(buf) );
 			
 			dht11_databuf=0;
 		}
 		else
 		{
-			printf("read dht11 error!\n");
+			print_e("read dht11 error!\n");
 		}
 		sleep(1);
 	}

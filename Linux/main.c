@@ -2,7 +2,6 @@
 SHARED g_data;
 static int data_init()
 {
-	printf("addr:%p,",&g_data);
 	int i;
 	for(i = 0;i < MAX_THREAD;i++)
 		g_data.status[i] = UN_USE;
@@ -12,10 +11,14 @@ static int data_init()
 int main(){
 	
 	//uint8 send_pic[250*1024]={0};
+	unsigned int width = WIDTH;
+	unsigned int height = HIGHT;
+	int size;
 
-	if( !( data_init() && dht11_init() && infrared_init() && service_init() && bee_init() ) )//camera_init(); && bee_init()
+	if( !( data_init() && dht11_init() && infrared_init() && \
+		service_init() && bee_init() ) )//&& camera_init(DEV_PATH, &width, &height, &size)
 	{
-		printf("init failed\n");
+		print_e("init failed\n");
 		return(0);
 	}
 
@@ -25,54 +28,53 @@ int main(){
 	pthread_t external_device[4];		//pthread_t infrared,dht11;camera,
 	
 	if( pthread_create(&external_device[bee],NULL,bee_run,(void*)1) != 0 ){
-		printf("Creat bee failed\n");
+		print_e("Creat bee failed\n");
 		exit(0);
 	}
 
-#ifdef PRINTF_SIGN
-	printf("Creat bee seccess\n");
-#endif
+	print_i("Creat bee seccess\n");
 
 	if( pthread_create(&external_device[infrared],NULL,infrared_run,(void*)1) != 0 ){
-		printf("Creat infrared failed\n");
+		print_e("Creat infrared failed\n");
 		exit(0);
 	}
 
-#ifdef PRINTF_SIGN
-	printf("Creat infrared seccess\n");
-#endif
+	print_i("Creat infrared seccess\n");
 	
 	if( pthread_create(&external_device[dht11],NULL,dht11_run,(void*)1) != 0 ){
-		printf("Creat dht11_run failed\n");
+		print_e("Creat dht11_run failed\n");
 		exit(0);
 	}
-#ifdef PRINTF_SIGN
-	printf("Creat dht11_run seccess\n");
+	print_i("Creat dht11_run seccess\n");
+#if 1
+	if( pthread_create(&external_device[camera],NULL,camera_run,(void*)1) != 0 ){
+		print_e("Creat camera_proess failed\n");
+		exit(0);
+	}
+	print_i("Creat camera_proess seccess\n");
 #endif
 /*************************    pthread_create    ***************************/
 
 	service_run();								//service_run
 
-	//Ïß³ÌÍË³ö
+	//wait thread exit
 	void *thrd_ret;
 	if(!pthread_join(external_device[bee],&thrd_ret) )
-#ifdef PRINTF_SIGN
-		printf("thread bee exited\n");
-#endif
+		print_w("thread bee exited\n");
 	else
-		printf("thread bee exit failed\n");
+		print_e("thread bee exit failed\n");
 	if(!pthread_join(external_device[infrared],&thrd_ret) )
-#ifdef PRINTF_SIGN
-		printf("thread infrared exited\n");
-#endif
+		print_w("thread infrared exited\n");
 	else
-		printf("thread infrared exit failed\n");
+		print_e("thread infrared exit failed\n");
 	if(!pthread_join(external_device[dht11],&thrd_ret) )
-#ifdef PRINTF_SIGN
-		printf("thread dht11 exited\n");
-#endif
+		print_w("thread dht11 exited\n");
 	else
-		printf("thread dht11 exit failed\n");
+		print_e("thread dht11 exit failed\n");
+	if(!pthread_join(external_device[camera],&thrd_ret) )
+		print_w("thread camera exited\n");
+	else
+		print_e("thread camera exit failed\n");
 
 	return 0;
 }
