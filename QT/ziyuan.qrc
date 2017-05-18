@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>jpg/camera.jpg</file>
+        <file>main.cpp</file>
+        <file>smart_home.cpp</file>
+        <file>smart_home.h</file>
+        <file>smart_home.pro</file>
+        <file>smart_home.ui</file>
+        <file>ziyuan.qrc</file>
+    </qresource>
+</RCC>
