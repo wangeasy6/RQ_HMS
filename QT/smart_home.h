@@ -14,9 +14,6 @@
 #define CONNECTED 'I'
 #define UN_CONNECT 'U'
 
-#define ENV_ON "GET /?action=get_val"
-#define CAMERA_ON "GET /?action=get_pic"
-
 #define Max_Send_Length 1024
 
 #define FIRE_V 29
@@ -39,10 +36,7 @@ protected slots:
     void SOLTlog();
     void soltConnected();
     void soltRecv();
-    void soltEnv();
-    void soltcamera_on();
     void soltclose();
-    void Camera();
     void ClickedAtHome();
     void ClickedLeaveHome();
     void checked_i();
@@ -50,7 +44,6 @@ protected slots:
 public:
     QTimer *time;
     QTcpSocket *socket;
-    QTcpSocket *s;
     char house_status;
     char connet_status;
     QSound *s_alarm;

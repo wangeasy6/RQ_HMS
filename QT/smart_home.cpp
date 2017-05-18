@@ -258,7 +258,6 @@ void smart_home::soltclose()
 {
     ui->connect->setEnabled(true);
     ui->disconnect->setEnabled(false);
-    this->camera_pix();
     socket->close();
     connet_status = UN_CONNECT;
     ui->HUM_M->display(0);
@@ -277,75 +276,6 @@ void smart_home::soltclose()
 }
 
 /******************************************** connect && recv_data && close ****************************************/
-
-void smart_home::soltcamera_on()
-{
-    /*
-    switch (this->camera_status) {
-    case CAMERA_false:
-        ui->camera_on->setText("关闭摄像头");
-        this->time->start(1000);
-        this->camera_status = CAMERA_true;
-        break;
-    case CAMERA_true:
-        ui->camera_on->setText("开启摄像头");
-        this->time->stop();
-        this->camera_status = CAMERA_false;
-        this->camera_pix();
-        break;
-    }
-    */
-    return;
-}
-
-void smart_home::soltEnv()
-{
-    QString str = "";
-    QString string;
-    ui->record->setText(str);  //清空文本框
-    strcpy(buf,ENV_ON);
-    s->write(buf,strlen(buf));
-    s->flush();
-    memset(buf,0,1024);
-    s->read(buf,1024);
-    if(buf != 0)
-    {
-        string.append(buf);
-        str += string;
-    }
-
-    ui->record->setText(str);
-}
-void smart_home::Camera()
-{
-    memset(buf,0,15);
-    strcpy(buf,CAMERA_ON);
-    qDebug()<<buf<<endl;
-    s->write(buf,strlen(buf));
-    s->flush();
-    s->read(buf,6);
-    int num = atoi(buf);
-    int count = num;
-    while(count>0)
-    {
-        int ret = s->read(buf1,num);
-        count =count - ret;
-    }
-    //char *buf2="GET /?getpic=1.jpg";
-    QPixmap pixmap;
-    pixmap.loadFromData((uchar *)buf1,num, "JPEG");
-    //pixmap.loadFromData((uchar *)buf2,num, "JPEG");
-    //ui->Video->setPixmap(pixmap);
-
-}
-
-void smart_home::camera_pix()
-{
-    QPixmap pix(":/jpg/white.jpg");
-    //ui->Video->setPixmap(pix);
-}
-
-
 
 
 
