@@ -2,9 +2,12 @@
 #define SMART_HOME_H
 
 #include <QWidget>
+#include <QSound>
+#include <QtMultimedia/QMediaPlayer>
 #include <QTcpSocket>
 #include <QThread>
 
+//  配置
 #define Leave_Home 'L'
 #define At_Home 'A'
 
@@ -16,7 +19,7 @@
 
 #define Max_Send_Length 1024
 
-class WorkThread;
+#define FIRE_V 29
 
 namespace Ui {
 class smart_home;
@@ -42,6 +45,7 @@ protected slots:
     void Camera();
     void ClickedAtHome();
     void ClickedLeaveHome();
+    void checked_i();
 
 public:
     QTimer *time;
@@ -49,10 +53,14 @@ public:
     QTcpSocket *s;
     char house_status;
     char connet_status;
+    QSound *s_alarm;
+    QSound *s_dingdong;
+    QSound *s_enter;
 
     uint len = 0;
     char pic_data[250 * 1024] = {0};
     int pos = 0;
+    int temp_h = FIRE_V;
 
 private:
     Ui::smart_home *ui;

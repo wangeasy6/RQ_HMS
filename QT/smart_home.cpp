@@ -39,9 +39,11 @@ smart_home::smart_home(QWidget *parent) :
     ui->TEM_M->setSegmentStyle(QLCDNumber::Flat);
     ui->TEM_M->setStyleSheet("border: 1px solid green; color: green; background: silver;");
 
-    ui->IP->setText("192.168.3.107");
+    ui->IP->setText("169.254.8.181");
 
     ui->Checked->setEnabled(false);
+    connect(ui->Checked, SIGNAL(clicked(bool)),
+            this, SLOT(checked_i()) );
     //connect();
     connect(ui->AtHome,SIGNAL(clicked()),
             this,SLOT(ClickedAtHome()));
@@ -51,6 +53,8 @@ smart_home::smart_home(QWidget *parent) :
 
     ui->connect->setEnabled(false);
     ui->disconnect->setEnabled(false);
+    ui->fired->setStyleSheet("color:red");
+    ui->fired->setVisible(false);
 
     ui->record->setReadOnly(true);
 
@@ -60,6 +64,9 @@ smart_home::smart_home(QWidget *parent) :
                 this, SLOT(SOLTlog()));
     connect(ui->disconnect,SIGNAL(clicked(bool)),
                 this,SLOT(soltclose()));
+    s_alarm = new QSound(":/sound/alarm.wav", Q_NULLPTR);
+    s_dingdong = new QSound(":/sound/dingdong.wav",Q_NULLPTR);
+    s_enter = new QSound(":/sound/enter.wav",Q_NULLPTR);
 }
 smart_home::~smart_home()
 {
@@ -92,12 +99,6 @@ void smart_home::SOLTlog()
     bool ok;
     int num = ui->Port->text().toInt(&ok,10);
     socket = new QTcpSocket(this);
-#ifdef MULTI_THREADING
-    s = new QTcpSocket(this);
-    connect(this->s,SIGNAL(connected()),
-            this,SLOT(soltConnect()));
-    s->connectToHost(QHostAddress(ui->lineEdit->text()),num);
-#endif
     connect(this->socket, SIGNAL(connected()),
            this, SLOT(soltConnected()));
    socket->connectToHost(QHostAddress(ui->IP->text()),num);
@@ -143,11 +144,23 @@ void smart_home::soltRecv()
 
                 ui->HUM_M->display(ENV[0].toInt());
                 ui->TEM_M->display(ENV[1].toInt());
+                if( ENV[1].toInt() > temp_h )
+                {
+                    if( s_alarm->isFinished() )
+                    {
+                        s_alarm->play();
+                    }
+                    ui->fired->setVisible(true);
+                }else{
+                    s_alarm->stop();
+                    ui->fired->setVisible(false);
+                }
             break;
             case 'I'://红外检测
             //qDebug() << "error data:" << data << "\r\n";
                 if('1' == data[1])
                 {
+                    ui->Checked->setEnabled(true);
                     QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
                     if(house_status == At_Home)
                     {
@@ -156,6 +169,11 @@ void smart_home::soltRecv()
                         ui->record->setText(str);
                         if( !pixmap.load(":/jpg/green.png",Q_NULLPTR,Qt::AutoColor) )
                             qDebug() << "load green.png error\n";
+                        if( s_dingdong->isFinished() )
+                        {
+                            s_dingdong->setLoops(3);
+                            s_dingdong->play();
+                        }
                     }
                     if(house_status == Leave_Home)
                     {
@@ -164,6 +182,11 @@ void smart_home::soltRecv()
                         ui->record->setText(str);
                         if( !pixmap.load(":/jpg/red.png",Q_NULLPTR,Qt::AutoColor) )
                             qDebug() << "load green.png error\n";
+                        if( s_enter->isFinished() )
+                        {
+                            s_enter->setLoops(100);
+                            s_enter->play();
+                        }
                     }
                     ui->Light->setPixmap(pixmap);
                 }
@@ -202,7 +225,7 @@ void smart_home::soltRecv()
                 if(len <= 0)
                 {
                     //QPixmap *pix = new QPixmap(320,240);
-                    QPixmap *pix;
+                    QPixmap *pix = new QPixmap();
                     pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
                     ui->Video->setPixmap( *pix );
                     qDebug()<<"setPixmap\n";
@@ -220,6 +243,17 @@ void smart_home::soltRecv()
     }
 }
 
+void smart_home::checked_i()
+{
+
+    if( !s_dingdong->isFinished() )
+        s_dingdong->stop();
+    if( !s_enter->isFinished() )
+        s_enter->stop();
+    ui->Light->clear();
+    ui->Checked->setEnabled(false);
+}
+
 void smart_home::soltclose()
 {
     ui->connect->setEnabled(true);
@@ -231,6 +265,12 @@ void smart_home::soltclose()
     ui->TEM_M->display(0);
     ui->record->clear();
     ui->Light->clear();
+    if( !s_alarm->isFinished() )
+        s_alarm->stop();
+    if( !s_dingdong->isFinished() )
+        s_dingdong->stop();
+    if( !s_enter->isFinished() )
+        s_enter->stop();
 #ifdef MULTI_THREADING
     s->close();
 #endif

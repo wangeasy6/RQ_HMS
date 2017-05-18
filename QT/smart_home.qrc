@@ -2,6 +2,10 @@
     <qresource prefix="/">
         <file>jpg/camera.jpg</file>
         <file>jpg/green.png</file>
+        <file>jpg/House_65px_1083824_easyicon.net.ico</file>
         <file>jpg/red.png</file>
+        <file>sound/alarm.wav</file>
+        <file>sound/dingdong.wav</file>
+        <file>sound/enter.wav</file>
     </qresource>
 </RCC>
