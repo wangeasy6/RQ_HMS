@@ -1,6 +1,6 @@
 #include "service.h"
 
-#define Max_Send_Length 1024
+#define Max_Send_Length 8*1024
 unsigned short int PORT = 9999;
 static int socket_fd;
 extern SHARED g_data;
@@ -21,7 +21,10 @@ int service_init()
 #ifdef PRINTF_SIGN
 printf("Socket create success\n");
 #endif
-	//setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	int yes = 1;
+	setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
+	int nSendBufLen = 32*1024; //设置为32K
+	setsockopt( socket_fd, SOL_SOCKET, SO_SNDBUF, ( const char* )&nSendBufLen, sizeof( int ) );
 
 	memset(&servaddr, 0, sizeof(struct sockaddr_in));
 	servaddr.sin_family = AF_INET;
@@ -58,9 +61,11 @@ printf("server listend\n");
 
 int send_data(const char *data,const unsigned int length)
 {
-	static int LEN,len,ret,pos,i,test;
+	static int LEN,len,pos,i,test;
+	static ssize_t ret;
 	static char send_buf[Max_Send_Length] = {0};
 	LEN = length;
+	static FILE *fp;
 
 	for(i = 0; i < MAX_THREAD ; i++)
 	{
@@ -68,7 +73,6 @@ int send_data(const char *data,const unsigned int length)
 		{
 			if ( LEN < 1024 )
 			{
-				printf("send_connfd:%d ,%s\n",i,data);
 				pthread_mutex_lock(&g_data.mutex);
 				ret = write(g_data.connfd[i], data, strlen(data));
 				pthread_mutex_unlock(&g_data.mutex);
@@ -81,50 +85,63 @@ int send_data(const char *data,const unsigned int length)
 			}
 			else
 			{
-			if(test == 1)
-			continue;
-			test = 1;
-			
+			#ifdef DEBUG
+				if(test == 1)
+				continue;
+				test = 1;
+			#endif
+						
+			    if((fp=fopen("./capture2.jpg","w+"))==NULL)
+				{
+					perror("Capture JPEG:");
+					return -1;
+				}
 				char header[10] = {0};
-				printf("send pic,size:%d\n",LEN);
+				#if SEND_INFO
+					printf("send pic,size:%d\n",LEN);
+				#endif
 				len = LEN;
 				snprintf(header, sizeof(header), "H%d", LEN);
+				pthread_mutex_lock(&g_data.mutex);
 				ret = write(g_data.connfd[i], header, sizeof(header));
-				printf("sizeof(send_buf):%d\n",sizeof(send_buf+1));
 				for(pos = 0,ret = 0;len > 0;len = len - ret)
-				{/*
+				{
+				#ifdef DEBUG
 					memset(send_buf, 0, sizeof(send_buf));
-					send_buf[0] = 'B';
-					if( Max_Send_Length-1 <= len )
+					if( Max_Send_Length <= len )
 					{
-						memcpy(send_buf+1, data+pos,Max_Send_Length-1);
-						pthread_mutex_lock(&g_data.mutex);
-						ret = write(g_data.connfd[i], send_buf, sizeof(send_buf) );
-						pthread_mutex_unlock(&g_data.mutex);
+						memcpy( send_buf, data+pos, Max_Send_Length );
+						ret = write( g_data.connfd[i], send_buf, Max_Send_Length );
+						fwrite(send_buf,Max_Send_Length,1,fp);
 					}
 					else
 					{
-						memcpy(send_buf+1, data+pos,len);
-						pthread_mutex_lock(&g_data.mutex);
-						ret = write(g_data.connfd[i], send_buf, len+1 );
-						pthread_mutex_unlock(&g_data.mutex);
+						memcpy(send_buf, data+pos,len);
+						ret = write( g_data.connfd[i], send_buf, len );
+						fwrite(send_buf,len,1,fp);
 					}
-					//ret = write( g_data.connfd[i], data+pos, len);
-					*/
+				#else
+					pthread_mutex_lock(&g_data.mutex);
 					ret = write( g_data.connfd[i], data+pos, len);
+					pthread_mutex_unlock(&g_data.mutex);
+				#endif
 					if (-1 == ret )
 					{
 						perror("server->write");
 						return FAILED;
 					}
-					printf("%c. len:%d  ret:%d  pos:%d \r\n",*send_buf,len,ret,pos);
-					//ret -= 1;
+					#if SEND_INFO
+						printf("len:%d  ret:%d  pos:%d \r\n", len, ret, pos);
+					#endif
 					pos += ret;
 				}
 				
-				printf("len:%d  ret:%d  pos:%d \n",len,ret,pos);
+				pthread_mutex_unlock(&g_data.mutex);
+				fclose(fp);
+				printf("len:%d  ret:%d  pos:%d \n", len, ret, pos);
+				return pos;
 			}
-
+			
 		}
 		else
 			continue;

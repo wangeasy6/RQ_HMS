@@ -1,5 +1,6 @@
 *.[ao]
 *.bak
+*.jpg
 /Linux/app
 QT/smart_home.pro.user
 build-smart_home-Desktop_Qt_5_7_0_MinGW_32bit-Debug/*

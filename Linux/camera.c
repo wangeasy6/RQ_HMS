@@ -277,6 +277,7 @@ void *camera_run(void *arg)
 	unsigned int height = HIGHT;
 	int size;
 	jpeg_buffers jpeg_buf;
+	static int test = 0;
 
 	ret = camera_init(DEV_PATH, &width, &height, &size); 
 	if( FAILED == ret)
@@ -324,8 +325,9 @@ void *camera_run(void *arg)
 		}
 		else
 		{
-			//camera_jpeg_gather(jpeg_buf.buf,jpeg_buf.length);
-			send_data( jpeg_buf.buf, jpeg_buf.length);
+			test = send_data( jpeg_buf.buf, jpeg_buf.length);
+			if ( test == jpeg_buf.length )
+				camera_jpeg_gather(jpeg_buf.buf,jpeg_buf.length);
 			//printf("send jpeg_buf,size:%d\n",jpeg_buf.length);
 		}
 		
