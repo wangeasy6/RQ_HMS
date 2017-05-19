@@ -16,9 +16,6 @@
 #include <QTime>
 #include <QPixmap>
 
-char buf1[100*1024];
-char buf[15];
-
 smart_home::smart_home(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::smart_home)
@@ -43,7 +40,7 @@ smart_home::smart_home(QWidget *parent) :
 
     ui->Checked->setEnabled(false);
     connect(ui->Checked, SIGNAL(clicked(bool)),
-            this, SLOT(checked_i()) );
+            this, SLOT(checked_bt()) );
     //connect();
     connect(ui->AtHome,SIGNAL(clicked()),
             this,SLOT(ClickedAtHome()));
@@ -67,6 +64,13 @@ smart_home::smart_home(QWidget *parent) :
     s_alarm = new QSound(":/sound/alarm.wav", Q_NULLPTR);
     s_dingdong = new QSound(":/sound/dingdong.wav",Q_NULLPTR);
     s_enter = new QSound(":/sound/enter.wav",Q_NULLPTR);
+
+    /*      file test
+    FILE *file_test = fopen("file_test.txt","w+");
+    fwrite("file ",sizeof("file "),1,file_test);
+    fwrite("test",sizeof("test"),1,file_test);
+    fclose(file_test);
+    */
 }
 smart_home::~smart_home()
 {
@@ -131,6 +135,45 @@ void smart_home::soltRecv()
         //ret = socket->readLine(data,1500);
         if(-1 == ret || 0 == ret)
             break;
+#if SAVE_FILE
+        if( len > 0 && ret != 2 && ret != 6)        //直接保存到文件
+        {
+            memcpy( pic_data+pos, data, ret );
+            len -= ret;
+            pos += ret;
+            qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
+            //fwrite(  data, ret, 1, cap_pic );
+            if(len <= 0)
+            {
+                fwrite(  pic_data, pos, 1,cap_pic );
+                fclose(cap_pic);
+                qDebug()<<"save Pixmap\n";
+                memset(pic_data, 0, sizeof(pic_data));
+                pos = 0;
+                len = 0;
+            }
+            continue;
+        }
+#else
+        if( len > 0 && ret != 2 && ret != 6)        //直接显示到界面
+        {
+            memcpy( pic_data+pos, data, ret );
+            len -= ret;
+            pos += ret;
+            qDebug() << "ret.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
+            if(len <= 0)
+            {
+                QPixmap *pix = new QPixmap(320,240);
+                pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
+                ui->Video->setPixmap( *pix );
+                qDebug()<<"set Pixmap\n";
+                memset(pic_data, 0, sizeof(pic_data));
+                pos = 0;
+                len = 0;
+            }
+            continue;
+        }
+#endif
         switch(data[0])
         {
             case 'E'://温湿度采集
@@ -196,54 +239,24 @@ void smart_home::soltRecv()
                 QString *length = new QString( data+1 );
                 len = length->toUInt(Q_NULLPTR,10);
                 pos =0;
+        #if SAVE_FILE
+                cap_pic = fopen("cap_picture.jpg", "wb+");
+                if(!cap_pic) //读取失败 if(!fp) 与 if(fp == NULL) 等价
+                {
+                    qDebug()<< "fopen err";
+                    return;
+                }
+        #endif
                 qDebug()<<"ret.H:"<< ret <<" ,Header_len:"<< len <<"\n";
             }
             break;
-            case 'B'://半包
-            {
-                ret -= 1;
-                len -= ret;
-                pos += ret;
-                memcpy( pic_data+pos, data+1, ret );
-                qDebug() << "ret.B: " << ret << "len" << len << " pos:" << pos << "\r\n";
-                if(len <= 0)
-                {
-                    QPixmap *pix = new QPixmap(320,240);
-                    pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
-                    ui->Video->setPixmap( *pix );
-                    qDebug()<<"setPixmap\n";
-                    memset(pic_data, 0, sizeof(pic_data));
-                    pos = 0;
-                }
-            }
-            break;
             default :
-            {
-                len -= ret;
-                pos += ret;
-                memcpy( pic_data+pos, data, ret );
-                if(len <= 0)
-                {
-                    //QPixmap *pix = new QPixmap(320,240);
-                    QPixmap *pix = new QPixmap();
-                    pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
-                    ui->Video->setPixmap( *pix );
-                    qDebug()<<"setPixmap\n";
-                    memset(pic_data, 0, sizeof(pic_data));
-                    pos = 0;
-                }
-                char debug_data[10] = {0};
-                for (int i=0;i<9;i++)
-                    debug_data[i] = data[i];
-                qDebug() << "ret.ERR: " << ret << "len" << len << " pos:" << pos << "data:"<< debug_data <<"\r\n";
-            }
-               // qDebug() << "ret.ERR: " << data << "\r\n";
             break;
         }
     }
 }
 
-void smart_home::checked_i()
+void smart_home::checked_bt()
 {
 
     if( !s_dingdong->isFinished() )
@@ -264,39 +277,24 @@ void smart_home::soltclose()
     ui->TEM_M->display(0);
     ui->record->clear();
     ui->Light->clear();
+    ui->fired->setVisible(false);
+    len = 0;
+    pos = 0;
+    memset(pic_data, 0, sizeof(pic_data));
     if( !s_alarm->isFinished() )
         s_alarm->stop();
     if( !s_dingdong->isFinished() )
         s_dingdong->stop();
     if( !s_enter->isFinished() )
         s_enter->stop();
+
+#if SAVE_FILE
+    if( cap_pic != NULL)
+        fclose(cap_pic);
+#endif
 #ifdef MULTI_THREADING
     s->close();
 #endif
 }
 
 /******************************************** connect && recv_data && close ****************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 #ifndef SMART_HOME_H
 #define SMART_HOME_H
 
+#include "stdio.h"
 #include <QWidget>
 #include <QSound>
 #include <QtMultimedia/QMediaPlayer>
@@ -14,9 +15,11 @@
 #define CONNECTED 'I'
 #define UN_CONNECT 'U'
 
-#define Max_Send_Length 1024
+#define Max_Send_Length 8*1024
 
 #define FIRE_V 29
+
+#define SAVE_FILE 0     // 0|1
 
 namespace Ui {
 class smart_home;
@@ -39,7 +42,7 @@ protected slots:
     void soltclose();
     void ClickedAtHome();
     void ClickedLeaveHome();
-    void checked_i();
+    void checked_bt();
 
 public:
     QTimer *time;
@@ -50,11 +53,13 @@ public:
     QSound *s_dingdong;
     QSound *s_enter;
 
-    uint len = 0;
+    int len = 0;
+    uint pos = 0;
     char pic_data[250 * 1024] = {0};
-    int pos = 0;
     int temp_h = FIRE_V;
-
+#if SAVE_FILE
+    FILE *cap_pic;
+#endif
 private:
     Ui::smart_home *ui;
 };
