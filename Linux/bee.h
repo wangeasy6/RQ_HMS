@@ -10,7 +10,6 @@
  
 #define DELAY 1
 #define bee_Pin 5
-#define PRINTF_SIGN
 
 #define START 1
 #define STOP 0

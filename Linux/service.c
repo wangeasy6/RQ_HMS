@@ -84,7 +84,7 @@ int send_data(const char *data,const unsigned int length)
 			}
 			else
 			{
-			#ifdef DEBUG
+			#if DEBUG
 				if(test == 1)
 				continue;
 				test = 1;

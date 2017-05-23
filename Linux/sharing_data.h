@@ -9,8 +9,8 @@
 #define UN_USE 0
 /****    		1|0   <--->   USE|UNUSE *****/
 #define PRINTF_SIGN 1
-#define SEND_INFO 1
-#define DEBUG 1
+#define SEND_INFO 0
+#define DEBUG 0
 
 #define MAX_THREAD 10
 #define DEV_NUM 4
