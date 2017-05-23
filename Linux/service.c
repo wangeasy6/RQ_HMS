@@ -65,7 +65,6 @@ int send_data(const char *data,const unsigned int length)
 	static ssize_t ret;
 	static char send_buf[Max_Send_Length] = {0};
 	LEN = length;
-	static FILE *fp;
 
 	for(i = 0; i < MAX_THREAD ; i++)
 	{
@@ -90,18 +89,12 @@ int send_data(const char *data,const unsigned int length)
 				continue;
 				test = 1;
 			#endif
-						
-			    if((fp=fopen("./capture2.jpg","w+"))==NULL)
-				{
-					perror("Capture JPEG:");
-					return -1;
-				}
 				char header[10] = {0};
 				#if SEND_INFO
 					printf("send pic,size:%d\n",LEN);
 				#endif
 				len = LEN;
-				snprintf(header, sizeof(header), "H%d", LEN);
+				snprintf(header, sizeof(header), "H%d\r\n", LEN);
 				pthread_mutex_lock(&g_data.mutex);
 				ret = write(g_data.connfd[i], header, sizeof(header));
 				for(pos = 0,ret = 0;len > 0;len = len - ret)
@@ -112,13 +105,11 @@ int send_data(const char *data,const unsigned int length)
 					{
 						memcpy( send_buf, data+pos, Max_Send_Length );
 						ret = write( g_data.connfd[i], send_buf, Max_Send_Length );
-						fwrite(send_buf,Max_Send_Length,1,fp);
 					}
 					else
 					{
 						memcpy(send_buf, data+pos,len);
 						ret = write( g_data.connfd[i], send_buf, len );
-						fwrite(send_buf,len,1,fp);
 					}
 				#else
 					pthread_mutex_lock(&g_data.mutex);
@@ -130,15 +121,17 @@ int send_data(const char *data,const unsigned int length)
 						perror("server->write");
 						return FAILED;
 					}
-					#if SEND_INFO
-						printf("len:%d  ret:%d  pos:%d \r\n", len, ret, pos);
-					#endif
+				#if SEND_INFO
+					printf("%x %x %x .len:%d  ret:%d  pos:%d \r\n",send_buf[0],send_buf[1],send_buf[2], len, ret, pos);
+				#endif
 					pos += ret;
 				}
 				
 				pthread_mutex_unlock(&g_data.mutex);
-				fclose(fp);
-				printf("len:%d  ret:%d  pos:%d \n", len, ret, pos);
+			#if SEND_INFO
+				//printf("len:%d  ret:%d  pos:%d \n", len, ret, pos);
+				printf("%x %x %x .len:%d  ret:%d  pos:%d \r\n",send_buf[0],send_buf[1],send_buf[2], len, ret, pos);
+			#endif
 				return pos;
 			}
 			
