@@ -141,15 +141,17 @@ void smart_home::soltRecv()
                     memcpy( pic_data+pos, data, ret );
                     len -= ret;
                     pos += ret;
+/*
                     char buf[20];
                     snprintf(buf, sizeof(buf), "%x %x %x ", data[0]&0xFF, data[1]&0xFF, data[2]&0xFF);
                     qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos << "buf:" << buf <<endl;
+*/
                     //fwrite(  data, ret, 1, cap_pic );
                     if(len <= 0)
                     {
                         fwrite(  pic_data, pos, 1,cap_pic );
                         fclose(cap_pic);
-                        qDebug()<<"save Pixmap\n";
+                        //qDebug()<<"save Pixmap\n";
                         memset(pic_data, 0, sizeof(pic_data));
                         pos = 0;
                         len = 0;
@@ -162,7 +164,7 @@ void smart_home::soltRecv()
                     memcpy( pic_data+pos, data, ret );
                     len -= ret;
                     pos += ret;
-                    qDebug() << "ret.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
+                    //qDebug() << "ret.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
                     if(len <= 0)
                     {
                         QPixmap *pix = new QPixmap(320,240);

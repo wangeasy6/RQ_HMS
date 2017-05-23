@@ -19,7 +19,8 @@
 
 #define FIRE_V 29
 
-#define SAVE_FILE 1     // 0|1
+#define SAVE_FILE 0     // 0|1
+#define Debug_Con 0
 
 namespace Ui {
 class smart_home;
