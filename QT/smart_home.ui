@@ -104,9 +104,9 @@
   <widget class="QTextBrowser" name="record">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>480</x>
      <y>270</y>
-     <width>261</width>
+     <width>271</width>
      <height>181</height>
     </rect>
    </property>

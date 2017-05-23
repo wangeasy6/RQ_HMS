@@ -19,7 +19,7 @@
 
 #define FIRE_V 29
 
-#define SAVE_FILE 0     // 0|1
+#define SAVE_FILE 1     // 0|1
 
 namespace Ui {
 class smart_home;
@@ -52,6 +52,7 @@ public:
     QSound *s_alarm;
     QSound *s_dingdong;
     QSound *s_enter;
+    QString log;
 
     int len = 0;
     uint pos = 0;
