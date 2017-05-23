@@ -135,45 +135,47 @@ void smart_home::soltRecv()
         //ret = socket->readLine(data,1500);
         if(-1 == ret || 0 == ret)
             break;
-#if SAVE_FILE
-        if( len > 0 && ret != 2 && ret != 6)        //直接保存到文件
-        {
-            memcpy( pic_data+pos, data, ret );
-            len -= ret;
-            pos += ret;
-            qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
-            //fwrite(  data, ret, 1, cap_pic );
-            if(len <= 0)
-            {
-                fwrite(  pic_data, pos, 1,cap_pic );
-                fclose(cap_pic);
-                qDebug()<<"save Pixmap\n";
-                memset(pic_data, 0, sizeof(pic_data));
-                pos = 0;
-                len = 0;
-            }
-            continue;
-        }
-#else
-        if( len > 0 && ret != 2 && ret != 6)        //直接显示到界面
-        {
-            memcpy( pic_data+pos, data, ret );
-            len -= ret;
-            pos += ret;
-            qDebug() << "ret.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
-            if(len <= 0)
-            {
-                QPixmap *pix = new QPixmap(320,240);
-                pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
-                ui->Video->setPixmap( *pix );
-                qDebug()<<"set Pixmap\n";
-                memset(pic_data, 0, sizeof(pic_data));
-                pos = 0;
-                len = 0;
-            }
-            continue;
-        }
-#endif
+        #if SAVE_FILE
+                if( len > 0 && ret != 2 && ret != 6)        //直接保存到文件
+                {
+                    memcpy( pic_data+pos, data, ret );
+                    len -= ret;
+                    pos += ret;
+                    char buf[20];
+                    snprintf(buf, sizeof(buf), "%x %x %x ", data[0]&0xFF, data[1]&0xFF, data[2]&0xFF);
+                    qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos << "buf:" << buf <<endl;
+                    //fwrite(  data, ret, 1, cap_pic );
+                    if(len <= 0)
+                    {
+                        fwrite(  pic_data, pos, 1,cap_pic );
+                        fclose(cap_pic);
+                        qDebug()<<"save Pixmap\n";
+                        memset(pic_data, 0, sizeof(pic_data));
+                        pos = 0;
+                        len = 0;
+                    }
+                    continue;
+                }
+        #else
+                if( len > 0 && ret != 2 && ret != 6)        //直接显示到界面
+                {
+                    memcpy( pic_data+pos, data, ret );
+                    len -= ret;
+                    pos += ret;
+                    qDebug() << "ret.PIC: " << ret << "len" << len << " pos:" << pos <<"\r\n";
+                    if(len <= 0)
+                    {
+                        QPixmap *pix = new QPixmap(320,240);
+                        pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
+                        ui->Video->setPixmap( *pix );
+                        qDebug()<<"set Pixmap\n";
+                        memset(pic_data, 0, sizeof(pic_data));
+                        pos = 0;
+                        len = 0;
+                    }
+                    continue;
+                }
+        #endif
         switch(data[0])
         {
             case 'E'://温湿度采集
@@ -207,9 +209,8 @@ void smart_home::soltRecv()
                     QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
                     if(house_status == At_Home)
                     {
-                        QString str = "You have a visitor , ";
-                        str.append(time.toString("yyyy-MM-dd hh:mm:ss"));
-                        ui->record->setText(str);
+                        log.append("You have a visitor , " + time.toString("yyyy-MM-dd hh:mm:ss") + "\r\n");
+                        ui->record->setText(log);
                         if( !pixmap.load(":/jpg/green.png",Q_NULLPTR,Qt::AutoColor) )
                             qDebug() << "load green.png error\n";
                         if( s_dingdong->isFinished() )
@@ -220,9 +221,8 @@ void smart_home::soltRecv()
                     }
                     if(house_status == Leave_Home)
                     {
-                        QString str = "Somebody broke in , ";
-                        str.append(time.toString("yyyy-MM-dd hh:mm:ss"));
-                        ui->record->setText(str);
+                        log.append("Somebody broke in, " + time.toString("yyyy-MM-dd hh:mm:ss") + "\r\n");
+                        ui->record->setText(log);
                         if( !pixmap.load(":/jpg/red.png",Q_NULLPTR,Qt::AutoColor) )
                             qDebug() << "load green.png error\n";
                         if( s_enter->isFinished() )
@@ -238,7 +238,19 @@ void smart_home::soltRecv()
             {
                 QString *length = new QString( data+1 );
                 len = length->toUInt(Q_NULLPTR,10);
-                pos =0;
+                pos = 0;
+                memset( pic_data, 0 ,sizeof(pic_data));
+                qDebug()<<"ret.H:"<< ret <<" ,Header_len:"<< len <<"\n";
+                if(ret > 10)
+                {
+                    ret -= 10;
+                    memcpy( pic_data+pos, data+10, ret );
+                    len -= ret;
+                    pos += ret;
+                    char buf[20];
+                    snprintf(buf, sizeof(buf), "%x %x %x ", data[10]&0xFF, data[11]&0xFF, data[12]&0xFF);
+                    qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos << "buf:" << buf <<endl;
+                }
         #if SAVE_FILE
                 cap_pic = fopen("cap_picture.jpg", "wb+");
                 if(!cap_pic) //读取失败 if(!fp) 与 if(fp == NULL) 等价
@@ -247,7 +259,6 @@ void smart_home::soltRecv()
                     return;
                 }
         #endif
-                qDebug()<<"ret.H:"<< ret <<" ,Header_len:"<< len <<"\n";
             }
             break;
             default :
@@ -275,12 +286,11 @@ void smart_home::soltclose()
     connet_status = UN_CONNECT;
     ui->HUM_M->display(0);
     ui->TEM_M->display(0);
+    len = 0;
+    log.clear();
     ui->record->clear();
     ui->Light->clear();
     ui->fired->setVisible(false);
-    len = 0;
-    pos = 0;
-    memset(pic_data, 0, sizeof(pic_data));
     if( !s_alarm->isFinished() )
         s_alarm->stop();
     if( !s_dingdong->isFinished() )
@@ -291,9 +301,6 @@ void smart_home::soltclose()
 #if SAVE_FILE
     if( cap_pic != NULL)
         fclose(cap_pic);
-#endif
-#ifdef MULTI_THREADING
-    s->close();
 #endif
 }
 
