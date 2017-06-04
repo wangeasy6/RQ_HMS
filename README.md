@@ -1,5 +1,5 @@
 # RQ_HMS
-## 采用树莓派3B和QT做的一个智能家居监控系统
+## 基于树莓派3B+和QT的一个智能家居监控系统
 
 * /Linux 目录存放服务器（树莓派）的代码
 * /QT 目录存放客户端（PC）的代码
@@ -14,19 +14,22 @@
 
 ### 已完成：
 
-* 火灾报警fired
-* 三种报警声
+* 火灾报警、拜访提示音、闯入报警
 * 读取dht11
 * 温湿度值校验
-* 读取门禁
 * 多连接支持，pthread & mutex
-* QT基本界面完成
+* QT基本界面
+* 视频
+* 日志
 
-### 未完成：
+### 结语
+* 本项目实现了家庭监控系统的基本功能，包括温湿度显示、视频显示、有人提醒、火灾报警、日志功能，但是由于项目初期对于系统目标以及功能设计的不完整，暂停开发。
 
-* 视频 + 优化
+### 可完善：
+
+* 视频优化
 * 用户登录
-* 日志（双向传输 & 数据库）
+* 日志升级（双向传输 & 数据库）
 * 常用IP下拉栏 + IP输入格式限制
 * 录制视频 + 回看功能
 * 短信 + 设置主机号码
@@ -39,17 +42,20 @@
 * 升级报警器
 * app客户端
 
-
 # RQ_HMS
 ## Made a home monitoring system with Raspberry Pi and QT.
 
-* /linux store the code on the Raspberry Pi.
-* /QT shore the code on the QT.
+* /linux stores the code on the Raspberry Pi.
+* /QT shores the QT code.
 
 ## Raspberry Pi physical connection:
 
 * DTH11 sensor monitor temperature and humidity,Connected to WiringPi_GPIO_1
 * Infrared sensor monitor pass and into,Connected to WiringPi_GPIO_4
+* The buzzer is used for alarm,Connected to WiringPi_GPIO_5
 * Camera connected to USB.
 
-## The system is still under development
+## Conclusion
+
+* This project implements the basic functions of the home monitoring system,include temperature and humidity display function、video display、reminder、fire alarm、log function.
+* However,due to the initial design of the system for the system goals and functional design is not completed, suspended development.
