@@ -271,13 +271,12 @@ void savebmp(char * pdata, char * bmp_file, int width, int height )
 
 void *camera_run(void *arg)
 {
-	struct v4l2_buffer buf;
-	int ret;
-	unsigned int width = WIDTH;
-	unsigned int height = HIGHT;
-	int size;
-	jpeg_buffers jpeg_buf;
-	static int test = 0;
+    struct v4l2_buffer buf;
+    int ret;
+    unsigned int width = WIDTH;
+    unsigned int height = HIGHT;
+    int size;
+    jpeg_buffers jpeg_buf;
 
 	ret = camera_init(DEV_PATH, &width, &height, &size); 
 	if( FAILED == ret)
@@ -302,35 +301,35 @@ void *camera_run(void *arg)
 #else
 	while(1)
 #endif
-	{
-		ret = ioctl (cam_fd, VIDIOC_DQBUF, &buf); 
-		if( -1 == ret)
-		{
-			perror("VIDIOC_DQBUF\n");
-			close(cam_fd);
-			pthread_exit(NULL);
-		}
-		
-		convert_yuv_to_rgb(buffers->start, rgb_buf.buf, WIDTH, HIGHT, 24);//RGB转换
-		rgb_buf.length=strlen(rgb_buf.buf);
-		
-		jpeg_buf.length = convert_rgb_to_jpg_work(rgb_buf.buf,jpeg_buf.buf,WIDTH,HIGHT,24,100);	
-		
-		
-		if( jpeg_buf.length < 2000 )
-		{
-			print_e( "jpeg_buf is wrong\r\n" );
-			ioctl (cam_fd, VIDIOC_QBUF,&buf);
-			continue;
-		}
-		else
-		{
-			test = send_data( jpeg_buf.buf, jpeg_buf.length);
-			if ( test == jpeg_buf.length )
-				camera_jpeg_gather(jpeg_buf.buf,jpeg_buf.length);
-			//printf("send jpeg_buf,size:%d\n",jpeg_buf.length);
-		}
-		
+    {
+        ret = ioctl (cam_fd, VIDIOC_DQBUF, &buf);
+        if( -1 == ret)
+        {
+            perror("VIDIOC_DQBUF\n");
+            close(cam_fd);
+            pthread_exit(NULL);
+        }
+
+        convert_yuv_to_rgb(buffers->start, rgb_buf.buf, WIDTH, HIGHT, 24);//RGB转换
+        rgb_buf.length=strlen(rgb_buf.buf);
+
+        jpeg_buf.length = convert_rgb_to_jpg_work(rgb_buf.buf,jpeg_buf.buf,WIDTH,HIGHT,24,100);
+
+
+        if( jpeg_buf.length < 2000 )
+        {
+            print_e( "jpeg_buf is wrong\r\n" );
+            ioctl (cam_fd, VIDIOC_QBUF,&buf);
+            continue;
+        }
+        else
+        {
+            if ( send_data( jpeg_buf.buf, jpeg_buf.length) == jpeg_buf.length )
+            {
+                camera_jpeg_gather(jpeg_buf.buf,jpeg_buf.length);
+            }
+        }
+
 #ifdef STDOUT
 	printf("%d\n", temp);
 	printf("length is: %d\n",buffers[buf.index].length);

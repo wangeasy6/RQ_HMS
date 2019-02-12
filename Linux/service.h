@@ -16,4 +16,7 @@
 
 #include "sharing_data.h"
 
+int service_init();
+int service_run();
+
 #endif

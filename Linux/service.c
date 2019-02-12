@@ -1,4 +1,5 @@
 #include "service.h"
+#include "infrared.h"
 
 #define Max_Send_Length 8*1024
 unsigned short int PORT = 9999;
@@ -172,34 +173,32 @@ static int free_node(int index)
 
 void *connect_process(void *arg)
 {
-	char buf[1024];
-	int index = (int*)arg - g_data.connfd;	
-	int ret;
-	reset_status();
-	printf("connfd index:%d In\n",index);
-	while(1)
-	{
-		memset(buf,0,sizeof(buf));
-		
-		int ret = recv(g_data.connfd[index], buf, sizeof(buf), 0);
-		{
-			//数据传输出错
-			if (-1 == ret)
-			{
-				printf("data error!\n");
-				break;
-			}
-			//客户端退出
-			if (0 == ret)
-			{
-				printf("user shutdown!\n");
-				break;
-			}
-		}
-	}
-	
-	free_node( index );
-	pthread_exit(NULL);
+    char buf[1024];
+    int index = (int*)arg - g_data.connfd;
+    int ret;
+    reset_status();
+    printf("connfd index:%d In\n",index);
+    while(1)
+    {
+        memset(buf,0,sizeof(buf));
+
+        int ret = recv(g_data.connfd[index], buf, sizeof(buf), 0);
+        {
+            if (-1 == ret)
+            {
+                printf("data error!\n");
+                continue;
+            }
+            if (0 == ret)
+            {
+                printf("user shutdown!\n");
+                break;
+            }
+        }
+    }
+
+    free_node( index );
+    pthread_exit(NULL);
 
 }
 

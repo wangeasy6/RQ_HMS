@@ -12,7 +12,6 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QMessageBox>
-#include <QTimer>
 #include <QTime>
 #include <QPixmap>
 
@@ -22,7 +21,6 @@ smart_home::smart_home(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("智能家居监控系统");
-    this->time = new QTimer(this);
     // 设置能显示的位数
     ui->HUM_M->setDigitCount(3);
     // 设置显示的模式为十进制
@@ -36,19 +34,19 @@ smart_home::smart_home(QWidget *parent) :
     ui->TEM_M->setSegmentStyle(QLCDNumber::Flat);
     ui->TEM_M->setStyleSheet("border: 1px solid green; color: green; background: silver;");
 
-    ui->IP->setText("169.254.8.181");
+    ui->IP->setText("192.168.199.209");
 
     ui->Checked->setEnabled(false);
     connect(ui->Checked, SIGNAL(clicked(bool)),
-            this, SLOT(checked_bt()) );
+            this, SLOT(checkedBT()) );
     //connect();
     connect(ui->AtHome,SIGNAL(clicked()),
-            this,SLOT(ClickedAtHome()));
+            this,SLOT(clickedAtHome()));
 
     connect(ui->LeaveHome,SIGNAL(clicked()),
-            this,SLOT(ClickedLeaveHome()));
+            this,SLOT(clickedLeaveHome()));
 
-    ui->connect->setEnabled(false);
+    ui->connect->setEnabled(true);
     ui->disconnect->setEnabled(false);
     ui->fired->setStyleSheet("color:red");
     ui->fired->setVisible(false);
@@ -58,9 +56,9 @@ smart_home::smart_home(QWidget *parent) :
     connet_status = UN_CONNECT;
 
     connect(ui->connect, SIGNAL(clicked()),
-                this, SLOT(SOLTlog()));
+                this, SLOT(soltLog()));
     connect(ui->disconnect,SIGNAL(clicked(bool)),
-                this,SLOT(soltclose()));
+                this,SLOT(soltClose()));
     s_alarm = new QSound(":/sound/alarm.wav", Q_NULLPTR);
     s_dingdong = new QSound(":/sound/dingdong.wav",Q_NULLPTR);
     s_enter = new QSound(":/sound/enter.wav",Q_NULLPTR);
@@ -78,7 +76,7 @@ smart_home::~smart_home()
 }
 /********************************************************* Init ***************************************************/
 
-void smart_home::ClickedAtHome()
+void smart_home::clickedAtHome()
 {
     house_status = At_Home;
     if(connet_status == UN_CONNECT && !ui->connect->isEnabled())
@@ -86,7 +84,7 @@ void smart_home::ClickedAtHome()
     return;
 }
 
-void smart_home::ClickedLeaveHome()
+void smart_home::clickedLeaveHome()
 {
     house_status = Leave_Home;
 
@@ -98,7 +96,7 @@ void smart_home::ClickedLeaveHome()
 
 /****************************************************** hose_status ***********************************************/
 
-void smart_home::SOLTlog()
+void smart_home::soltLog()
 {
     bool ok;
     int num = ui->Port->text().toInt(&ok,10);
@@ -131,7 +129,14 @@ void smart_home::soltRecv()
 
     while(1)
     {
-        ret = socket->read(data,Max_Send_Length);
+        if (len > Max_Send_Length || len == 0)
+        {
+            ret = socket->read(data,Max_Send_Length);
+        }
+        else
+        {
+            ret = socket->read(data,len);
+        }
         //ret = socket->readLine(data,1500);
         if(-1 == ret || 0 == ret)
             break;
@@ -170,7 +175,7 @@ void smart_home::soltRecv()
                         QPixmap *pix = new QPixmap(320,240);
                         pix->loadFromData( (uchar*)pic_data, pos, "JPEG" );
                         ui->Video->setPixmap( *pix );
-                        qDebug()<<"set Pixmap\n";
+                        //qDebug()<<"set Pixmap\n";
                         memset(pic_data, 0, sizeof(pic_data));
                         pos = 0;
                         len = 0;
@@ -242,7 +247,7 @@ void smart_home::soltRecv()
                 len = length->toUInt(Q_NULLPTR,10);
                 pos = 0;
                 memset( pic_data, 0 ,sizeof(pic_data));
-                qDebug()<<"ret.H:"<< ret <<" ,Header_len:"<< len <<"\n";
+                //qDebug()<<"ret.H:"<< ret <<" ,Header_len:"<< len <<"\n";
                 if(ret > 10)
                 {
                     ret -= 10;
@@ -251,7 +256,7 @@ void smart_home::soltRecv()
                     pos += ret;
                     char buf[20];
                     snprintf(buf, sizeof(buf), "%x %x %x ", data[10]&0xFF, data[11]&0xFF, data[12]&0xFF);
-                    qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos << "buf:" << buf <<endl;
+                    //qDebug() << "ret.save.PIC: " << ret << "len" << len << " pos:" << pos << "buf:" << buf <<endl;
                 }
         #if SAVE_FILE
                 cap_pic = fopen("cap_picture.jpg", "wb+");
@@ -269,9 +274,8 @@ void smart_home::soltRecv()
     }
 }
 
-void smart_home::checked_bt()
+void smart_home::checkedBT()
 {
-
     if( !s_dingdong->isFinished() )
         s_dingdong->stop();
     if( !s_enter->isFinished() )
@@ -280,7 +284,7 @@ void smart_home::checked_bt()
     ui->Checked->setEnabled(false);
 }
 
-void smart_home::soltclose()
+void smart_home::soltClose()
 {
     ui->connect->setEnabled(true);
     ui->disconnect->setEnabled(false);

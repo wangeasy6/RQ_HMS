@@ -1,7 +1,6 @@
 #ifndef SMART_HOME_H
 #define SMART_HOME_H
 
-#include "stdio.h"
 #include <QWidget>
 #include <QSound>
 #include <QtMultimedia/QMediaPlayer>
@@ -29,41 +28,39 @@ class smart_home;
 class smart_home : public QWidget
 {
     Q_OBJECT
+    Ui::smart_home *ui;
 
 public:
     explicit smart_home(QWidget *parent = 0);
     ~smart_home();
-    void camera_pix();
 
 
 protected slots:
-    void SOLTlog();
+    void soltLog();
     void soltConnected();
     void soltRecv();
-    void soltclose();
-    void ClickedAtHome();
-    void ClickedLeaveHome();
-    void checked_bt();
+    void soltClose();
+    void clickedAtHome();
+    void clickedLeaveHome();
+    void checkedBT();
 
-public:
-    QTimer *time;
+private:
     QTcpSocket *socket;
     char house_status;
     char connet_status;
     QSound *s_alarm;
     QSound *s_dingdong;
     QSound *s_enter;
+    int temp_h = FIRE_V;    // 温度报警阈值
     QString log;
 
     int len = 0;
     uint pos = 0;
     char pic_data[250 * 1024] = {0};
-    int temp_h = FIRE_V;
+
 #if SAVE_FILE
     FILE *cap_pic;
 #endif
-private:
-    Ui::smart_home *ui;
 };
 
 
