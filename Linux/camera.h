@@ -27,29 +27,25 @@
 
 extern sem_t JPG;
 
-typedef struct VideoBuffer{		//����һ���ṹ��,Ŀ��������ӳ��ÿ������֡
-		void *start;
-		size_t length;
-	}VideoBuffer;
-	
-
+typedef struct VideoBuffer{
+	void *start;
+	size_t length;
+}VideoBuffer;
 VideoBuffer buffers[4];
 
-//RGB�Ĵ洢
 typedef struct rgb_buffers
 {
 	char buf[250*1024];
 	unsigned int length;
 }rgb_buffers;
 
-//JPEG�Ĵ洢
 typedef struct jpeg_buffers
 {
 	char buf[250*1024];
 	unsigned int length;
 }jpeg_buffers;
 
-//JPEGת���ṹ��
+//JPEG Convert Struct
 typedef struct {
 	struct jpeg_destination_mgr pub;
 	JOCTET *buffer;
@@ -65,7 +61,7 @@ struct jpeg_mgr_info {
 	struct jpeg_compress_struct cinfo;
 };
 
-//BMP�õ��Ľṹ�弰�궨��
+//BMP Struct Define
 typedef long LONG;  
 typedef unsigned long DWORD;  
 typedef unsigned short WORD;  
@@ -90,10 +86,10 @@ typedef struct{
         DWORD      biClrImportant;  
 } BMPINFOHEADER_T;  
 
-//JPEG��ȫ�ֱ���
+//JPEG global
 static struct jpeg_mgr_info jinfo;
 
-//RGB��ת����ʽ
+//RGB Convert data
 static short radj[] = {
 	-175, -174, -172, -171, -169, -168, -167, -165, 
 	-164, -163, -161, -160, -159, -157, -156, -154, 
@@ -236,13 +232,13 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 
 int camera_start(int fd);
 
-//YUYVתRGB
+//YUYV to RGB
 void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int bps);
 
-//RGBתJPEG
+//RGB to JPEG
 int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned int height, unsigned int bpp, int quality);
 
-//RGBתBMPд��3.bmp
+//RGB convert to BMP and save
 void savebmp(char * pdata, char * bmp_file, int width, int height );
 
 void *camera_run(void *arg);

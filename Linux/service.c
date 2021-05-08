@@ -24,7 +24,7 @@ printf("Socket create success\n");
 #endif
 	int yes = 1;
 	setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
-	int nSendBufLen = 32*1024; //设置为32K
+	int nSendBufLen = 32*1024; //32K
 	setsockopt( socket_fd, SOL_SOCKET, SO_SNDBUF, ( const char* )&nSendBufLen, sizeof( int ) );
 
 	memset(&servaddr, 0, sizeof(struct sockaddr_in));

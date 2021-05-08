@@ -6,29 +6,29 @@ rgb_buffers rgb_buf;
 extern int send_data(const char *data,const unsigned int length);
 extern SHARED *g_data;
 
-static cap_abilities(__u32 capabilities)
+static void cap_abilities(__u32 capabilities)
 {
 	printf("capabilities:");
-	 if(capabilities & V4L2_CAP_VIDEO_CAPTURE)  fprintf(stdout,"\tV4L2_CAP_VIDEO_CAPTURE");
-	 if(capabilities & V4L2_CAP_VIDEO_OUTPUT)   fprintf(stdout,"\tV4L2_CAP_VIDEO_OUTPUT");
-	 if(capabilities & V4L2_CAP_VIDEO_OVERLAY)  fprintf(stdout,"\tV4L2_CAP_VIDEO_OVERLAY");
-	 if(capabilities & V4L2_CAP_VBI_CAPTURE)   fprintf(stdout,"\tV4L2_CAP_VBI_CAPTURE");
-	 if(capabilities & V4L2_CAP_VBI_OUTPUT)   fprintf(stdout,"\tV4L2_CAP_VBI_OUTPUT");
-	 if(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) fprintf(stdout,"\tV4L2_CAP_SLICED_VBI_CAPTURE");
-	 if(capabilities & V4L2_CAP_SLICED_VBI_OUTPUT) fprintf(stdout,"\tV4L2_CAP_SLICED_VBI_OUTPUT");
-	 if(capabilities & V4L2_CAP_RDS_CAPTURE)   fprintf(stdout,"\tV4L2_CAP_RDS_CAPTURE");
-	 if(capabilities & V4L2_CAP_VIDEO_OUTPUT_OVERLAY) fprintf(stdout,"\tV4L2_CAP_VIDEO_OUTPUT_OVERLAY");
-	 if(capabilities & V4L2_CAP_HW_FREQ_SEEK)   fprintf(stdout,"\tV4L2_CAP_HW_FREQ_SEEK");
-	 if(capabilities & V4L2_CAP_RDS_OUTPUT)   fprintf(stdout,"\tV4L2_CAP_RDS_OUTPUT");
-	 if(capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) fprintf(stdout,"\tV4L2_CAP_VIDEO_CAPTURE_MPLANE");
-	 if(capabilities & V4L2_CAP_VIDEO_OUTPUT_MPLANE) fprintf(stdout,"\tV4L2_CAP_VIDEO_OUTPUT_MPLANE");
-	 if(capabilities & V4L2_CAP_TUNER )    fprintf(stdout,"\tV4L2_CAP_TUNER ");
-	 if(capabilities & V4L2_CAP_AUDIO)    fprintf(stdout,"\tV4L2_CAP_AUDIO");
-	 if(capabilities & V4L2_CAP_RADIO)    fprintf(stdout,"\tV4L2_CAP_RADIO");
-	 if(capabilities & V4L2_CAP_MODULATOR)   fprintf(stdout,"\tV4L2_CAP_MODULATOR");
-	 if(capabilities & V4L2_CAP_READWRITE)   fprintf(stdout,"\tV4L2_CAP_READWRITE");
-	 if(capabilities & V4L2_CAP_ASYNCIO)    fprintf(stdout,"\tV4L2_CAP_ASYNCIO");
-	 if(capabilities & V4L2_CAP_STREAMING)   fprintf(stdout,"\tV4L2_CAP_STREAMING");
+	if(capabilities & V4L2_CAP_VIDEO_CAPTURE)  fprintf(stdout,"\tV4L2_CAP_VIDEO_CAPTURE");
+	if(capabilities & V4L2_CAP_VIDEO_OUTPUT)   fprintf(stdout,"\tV4L2_CAP_VIDEO_OUTPUT");
+	if(capabilities & V4L2_CAP_VIDEO_OVERLAY)  fprintf(stdout,"\tV4L2_CAP_VIDEO_OVERLAY");
+	if(capabilities & V4L2_CAP_VBI_CAPTURE)   fprintf(stdout,"\tV4L2_CAP_VBI_CAPTURE");
+	if(capabilities & V4L2_CAP_VBI_OUTPUT)   fprintf(stdout,"\tV4L2_CAP_VBI_OUTPUT");
+	if(capabilities & V4L2_CAP_SLICED_VBI_CAPTURE) fprintf(stdout,"\tV4L2_CAP_SLICED_VBI_CAPTURE");
+	if(capabilities & V4L2_CAP_SLICED_VBI_OUTPUT) fprintf(stdout,"\tV4L2_CAP_SLICED_VBI_OUTPUT");
+	if(capabilities & V4L2_CAP_RDS_CAPTURE)   fprintf(stdout,"\tV4L2_CAP_RDS_CAPTURE");
+	if(capabilities & V4L2_CAP_VIDEO_OUTPUT_OVERLAY) fprintf(stdout,"\tV4L2_CAP_VIDEO_OUTPUT_OVERLAY");
+	if(capabilities & V4L2_CAP_HW_FREQ_SEEK)   fprintf(stdout,"\tV4L2_CAP_HW_FREQ_SEEK");
+	if(capabilities & V4L2_CAP_RDS_OUTPUT)   fprintf(stdout,"\tV4L2_CAP_RDS_OUTPUT");
+	if(capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE) fprintf(stdout,"\tV4L2_CAP_VIDEO_CAPTURE_MPLANE");
+	if(capabilities & V4L2_CAP_VIDEO_OUTPUT_MPLANE) fprintf(stdout,"\tV4L2_CAP_VIDEO_OUTPUT_MPLANE");
+	if(capabilities & V4L2_CAP_TUNER )    fprintf(stdout,"\tV4L2_CAP_TUNER ");
+	if(capabilities & V4L2_CAP_AUDIO)    fprintf(stdout,"\tV4L2_CAP_AUDIO");
+	if(capabilities & V4L2_CAP_RADIO)    fprintf(stdout,"\tV4L2_CAP_RADIO");
+	if(capabilities & V4L2_CAP_MODULATOR)   fprintf(stdout,"\tV4L2_CAP_MODULATOR");
+	if(capabilities & V4L2_CAP_READWRITE)   fprintf(stdout,"\tV4L2_CAP_READWRITE");
+	if(capabilities & V4L2_CAP_ASYNCIO)    fprintf(stdout,"\tV4L2_CAP_ASYNCIO");
+	if(capabilities & V4L2_CAP_STREAMING)   fprintf(stdout,"\tV4L2_CAP_STREAMING");
 }
 
 int camera_init(const char *devpath, unsigned int *width, unsigned int *height, int *size )
@@ -40,8 +40,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 		return FAILED;
 	}
 	
-	
-	//��ʾ�豸��Ϣ
+	//Show device info
 	struct v4l2_capability cap;
 	if(ioctl(cam_fd, VIDIOC_QUERYCAP, &cap) < 0){
 		perror("ioctl");
@@ -52,13 +51,13 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	cap_abilities(cap.capabilities);
 	printf("\n\n");
 
-	//������Ƶ�����ʽ
+	//Set video capture format
 	struct v4l2_format fmt;
 	memset(&fmt, 0, sizeof(fmt));
 	fmt.type     			= V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	fmt.fmt.pix.width       = *width;
 	fmt.fmt.pix.height      = *height;
-	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;	//��ѡ������β鿴������
+	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
 	fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
 	
 	if(ioctl(cam_fd, VIDIOC_S_FMT, &fmt) == -1){
@@ -72,7 +71,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	}
 	printf("Current data format information:\n\twidth:%d\theight:%d\n\n",fmt.fmt.pix.width,fmt.fmt.pix.height);
 
-	//�����ڴ�,����һ��ӵ���ĸ�����֡�Ļ�����
+	//Get buffer * 4
 	struct v4l2_requestbuffers req;
 	memset(&req, 0, sizeof(req));
 	req.count	= 4;
@@ -83,19 +82,17 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 		return FAILED;
 	}
 
-	//��ȡ����¼���������ռ�
-	//buffers = calloc(req.count, sizeof(*buffers));	//�������ĸ��˽ṹ��Ŀռ�
+	//buffers = calloc(req.count, sizeof(*buffers));
 	
-	//��ȡ����֡�ĵ�ַ������
-	int numBufs;
+	//Get buffer address and length
 	struct v4l2_buffer buf;
-	for(numBufs = 0; numBufs < req.count; numBufs++){	//numBufsδ����
+	for(int numBufs = 0; numBufs < req.count; numBufs++){
 		memset(&buf, 0, sizeof(buf));
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory = V4L2_MEMORY_MMAP;
 		buf.index = numBufs;
 		
-		//ӳ��
+		//Mapping
 		if(ioctl(cam_fd, VIDIOC_QUERYBUF, &buf) == -1){	
 			return FAILED;
 		}
@@ -110,7 +107,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory = V4L2_MEMORY_MMAP;
 		
-		//���뻺�����
+		//Put in buffer queue
 		if(ioctl(cam_fd, VIDIOC_QBUF, &buf) == -1){
 			return FAILED;
 		}
@@ -138,7 +135,7 @@ int camera_start(int fd)
 	return SECCESS;
 }
 
-///JPEGд��2.c
+///Write JPEG buffer to file
 int camera_jpeg_gather(char *buffers,int len)
 {
 	FILE *fp;
@@ -152,7 +149,7 @@ int camera_jpeg_gather(char *buffers,int len)
 	return 0;
 }
 
-//YUYVתRGB
+//YUYV to RGB
 void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int bps)
 {
 	unsigned int i;
@@ -186,14 +183,13 @@ void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int
 
 
 
-//RGBתJPEG
+//RGB to JPEG
 int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned int height, unsigned int bpp, int quality)
 {	
-//RGBתJPEG��ʼ��
+	// init
 	memset(&jinfo, 0, sizeof(struct jpeg_mgr_info));
 	jinfo.cinfo.err = jpeg_std_error(&jinfo.jerr);
 	jpeg_create_compress(&jinfo.cinfo);
-	//EOR
 	
 	jinfo.written = width * height * bpp / 3;
 	jpeg_mem_dest(&jinfo.cinfo, (unsigned char **)&jpeg, &jinfo.written);
@@ -207,67 +203,63 @@ int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned 
 
 	jpeg_start_compress(&jinfo.cinfo, TRUE);
 
-	//EOR
 	while(jinfo.cinfo.next_scanline < height) {
 		jinfo.row_pointer[0] = rgb + jinfo.cinfo.next_scanline * width * bpp / 8;
 		jpeg_write_scanlines(&jinfo.cinfo, jinfo.row_pointer, 1);
 	//	jinfo.cinfo.next_scanline++;
 	}
-//RGBתJPEG�˳�
+
 	jpeg_finish_compress(&jinfo.cinfo);
-	//EOR
 	return (jinfo.written);
 }
 
-//RGBתBMPд��3.bmp
+//RGB to BMP and save
 void savebmp(char * pdata, char * bmp_file, int width, int height )  
 {   
-	//�ֱ�Ϊrgb���ݣ�Ҫ�����bmp�ļ�����ͼƬ����  
-       int size = width*height*3*sizeof(char); // ÿ�����ص�3���ֽ�  
-       // λͼ��һ���֣��ļ���Ϣ  
-       BMPFILEHEADER_T bfh;  
-       bfh.bfType = (WORD)0x4d42;  //bm  
-       bfh.bfSize = size  // data size  
-              + sizeof( BMPFILEHEADER_T ) // first section size  
-              + sizeof( BMPINFOHEADER_T ) // second section size  
-              ;  
-       bfh.bfReserved1 = 0; // reserved  
-       bfh.bfReserved2 = 0; // reserved  
-       bfh.bfOffBits = sizeof( BMPFILEHEADER_T )+ sizeof( BMPINFOHEADER_T );//���������ݵ�λ��  
-  
-       // λͼ�ڶ����֣�������Ϣ  
-       BMPINFOHEADER_T bih;  
-       bih.biSize = sizeof(BMPINFOHEADER_T);  
-       bih.biWidth = width;  
-       bih.biHeight = -height;//BMPͼƬ�����һ���㿪ʼɨ�裬��ʾʱͼƬ�ǵ��ŵģ�������-height������ͼƬ������  
-       bih.biPlanes = 1;//Ϊ1�����ø�  
-       bih.biBitCount = 24;  
-       bih.biCompression = 0;//��ѹ��  
-       bih.biSizeImage = size;  
-       bih.biXPelsPerMeter = 2835 ;//����ÿ��  
-       bih.biYPelsPerMeter = 2835 ;  
-       bih.biClrUsed = 0;//���ù�����ɫ��24λ��Ϊ0  
-       bih.biClrImportant = 0;//ÿ�����ض���Ҫ  
-       FILE * fp = fopen( bmp_file,"wb" );  
-       if( !fp ){
-		   perror("bmp_file");
-		   return ;
-	   }
-  
-       fwrite( &bfh, 8, 1,  fp );//����linux��4�ֽڶ��룬����Ϣͷ��СΪ54�ֽڣ���һ����14�ֽڣ��ڶ�����40�ֽڣ����ԻὫ��һ���ֲ���Ϊ16�Լ���ֱ����sizeof����ͼƬʱ�ͻ�����premature end-of-file encountered����  
-       fwrite(&bfh.bfReserved2, sizeof(bfh.bfReserved2), 1, fp);  
-       fwrite(&bfh.bfOffBits, sizeof(bfh.bfOffBits), 1, fp);  
-       fwrite( &bih, sizeof(BMPINFOHEADER_T),1,fp );  
-       fwrite(pdata,size,1,fp);  
-       fclose( fp );
-	   //EOR
+	int size = width*height*3*sizeof(char); //3 bytes per pixel
+	//Bitmap part 1, file information
+	BMPFILEHEADER_T bfh;  
+	bfh.bfType = (WORD)0x4d42;  //bm  
+	bfh.bfSize = size  // data size  
+			+ sizeof( BMPFILEHEADER_T ) // first section size  
+			+ sizeof( BMPINFOHEADER_T ) // second section size  
+			;  
+	bfh.bfReserved1 = 0; // reserved  
+	bfh.bfReserved2 = 0; // reserved  
+	bfh.bfOffBits = sizeof( BMPFILEHEADER_T )+ sizeof( BMPINFOHEADER_T );	//Real data start index
+
+	//Bitmap part 2, data
+	BMPINFOHEADER_T bih;  
+	bih.biSize = sizeof(BMPINFOHEADER_T);  
+	bih.biWidth = width;  
+	bih.biHeight = -height;//BMP image is scanned from the last point.When displayed,the image is upside down,so use -height
+	bih.biPlanes = 1;
+	bih.biBitCount = 24;  
+	bih.biCompression = 0;	//No compression
+	bih.biSizeImage = size;  
+	bih.biXPelsPerMeter = 2835 ;
+	bih.biYPelsPerMeter = 2835 ;  
+	bih.biClrUsed = 0;
+	bih.biClrImportant = 0;
+	FILE * fp = fopen( bmp_file,"wb" );  
+	if( !fp ){
+		perror("bmp_file");
+		return ;
+	}
+
+	fwrite( &bfh, 8, 1,  fp );
+	fwrite(&bfh.bfReserved2, sizeof(bfh.bfReserved2), 1, fp);  
+	fwrite(&bfh.bfOffBits, sizeof(bfh.bfOffBits), 1, fp);  
+	fwrite( &bih, sizeof(BMPINFOHEADER_T),1,fp );  
+	fwrite(pdata,size,1,fp);  
+	fclose( fp );
 } 
 
-	/*
-	//��Ƶ��������
-	struct v412_input input;
-	ioctl(cam_fd, VIDIOC_S_INPUT, &input);
-	*/
+/*
+//Video output settings
+struct v412_input input;
+ioctl(cam_fd, VIDIOC_S_INPUT, &input);
+*/
 
 void *camera_run(void *arg)
 {
@@ -310,7 +302,7 @@ void *camera_run(void *arg)
             pthread_exit(NULL);
         }
 
-        convert_yuv_to_rgb(buffers->start, rgb_buf.buf, WIDTH, HEIGHT, 24);//RGB转换
+        convert_yuv_to_rgb(buffers->start, rgb_buf.buf, WIDTH, HEIGHT, 24);
         rgb_buf.length=strlen(rgb_buf.buf);
 
         jpeg_buf.length = convert_rgb_to_jpg_work(rgb_buf.buf,jpeg_buf.buf,WIDTH,HEIGHT,24,100);
