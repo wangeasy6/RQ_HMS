@@ -19,7 +19,7 @@
 #define ROUND_0_255(v)	((v) < 0 ? 0 : ((v) > 255 ? 255 : (v)))
 #define EOR printf("%s: %d\n", __FUNCTION__, __LINE__);
 #define WIDTH 320	//width
-#define HIGHT 240	//height
+#define HEIGHT 240	//height
 #define DEV_PATH "/dev/video0"
 
 #define F_STR printf("%s start...\n",__FUNCTION__);
@@ -27,7 +27,7 @@
 
 extern sem_t JPG;
 
-typedef struct VideoBuffer{		//定义一个结构体,目的是用来映射每个缓冲帧
+typedef struct VideoBuffer{		//锟斤拷锟斤拷一锟斤拷锟结构锟斤拷,目锟斤拷锟斤拷锟斤拷锟斤拷映锟斤拷每锟斤拷锟斤拷锟斤拷帧
 		void *start;
 		size_t length;
 	}VideoBuffer;
@@ -35,21 +35,21 @@ typedef struct VideoBuffer{		//定义一个结构体,目的是用来映射每个缓冲帧
 
 VideoBuffer buffers[4];
 
-//RGB的存储
+//RGB锟侥存储
 typedef struct rgb_buffers
 {
 	char buf[250*1024];
 	unsigned int length;
 }rgb_buffers;
 
-//JPEG的存储
+//JPEG锟侥存储
 typedef struct jpeg_buffers
 {
 	char buf[250*1024];
 	unsigned int length;
 }jpeg_buffers;
 
-//JPEG转换结构体
+//JPEG转锟斤拷锟结构锟斤拷
 typedef struct {
 	struct jpeg_destination_mgr pub;
 	JOCTET *buffer;
@@ -65,7 +65,7 @@ struct jpeg_mgr_info {
 	struct jpeg_compress_struct cinfo;
 };
 
-//BMP用到的结构体及宏定义
+//BMP锟矫碉拷锟侥结构锟藉及锟疥定锟斤拷
 typedef long LONG;  
 typedef unsigned long DWORD;  
 typedef unsigned short WORD;  
@@ -90,10 +90,10 @@ typedef struct{
         DWORD      biClrImportant;  
 } BMPINFOHEADER_T;  
 
-//JPEG的全局变量
+//JPEG锟斤拷全锟街憋拷锟斤拷
 static struct jpeg_mgr_info jinfo;
 
-//RGB的转换方式
+//RGB锟斤拷转锟斤拷锟斤拷式
 static short radj[] = {
 	-175, -174, -172, -171, -169, -168, -167, -165, 
 	-164, -163, -161, -160, -159, -157, -156, -154, 
@@ -242,7 +242,7 @@ void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int
 //RGB转JPEG
 int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned int height, unsigned int bpp, int quality);
 
-//RGB转BMP写入3.bmp
+//RGB转BMP写锟斤拷3.bmp
 void savebmp(char * pdata, char * bmp_file, int width, int height );
 
 void *camera_run(void *arg);

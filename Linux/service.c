@@ -53,7 +53,7 @@ printf("bind port:%d \nIP:%s\n",PORT,inet_ntoa(servaddr.sin_addr));
 		return 0;
 	}
 #ifdef PRINTF_SIGN
-printf("server listend\n");
+printf("server listening\n");
 #endif
 	
 	pthread_mutex_init(&g_data.mutex,NULL);
@@ -213,7 +213,7 @@ int service_run()
 	while (1) {
 		index = get_node();
 		if ( index == FAILED )
-		{	
+		{
 			continue;
 		}
 		addrlen = sizeof(struct sockaddr_in);

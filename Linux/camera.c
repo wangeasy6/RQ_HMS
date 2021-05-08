@@ -41,7 +41,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	}
 	
 	
-	//œ‘ æ…Ë±∏–≈œ¢
+	//ÔøΩÔøΩ æÔøΩË±∏ÔøΩÔøΩœ¢
 	struct v4l2_capability cap;
 	if(ioctl(cam_fd, VIDIOC_QUERYCAP, &cap) < 0){
 		perror("ioctl");
@@ -52,13 +52,13 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	cap_abilities(cap.capabilities);
 	printf("\n\n");
 
-	//…Ë÷√ ”∆µ≤∂ªÒ∏Ò Ω
+	//ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ∆µÔøΩÔøΩÔøΩÔøΩÔøΩ Ω
 	struct v4l2_format fmt;
 	memset(&fmt, 0, sizeof(fmt));
 	fmt.type     			= V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	fmt.fmt.pix.width       = *width;
 	fmt.fmt.pix.height      = *height;
-	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;	//¥˝—°≤Œ ˝»Á∫Œ≤Èø¥£ø£ø£ø
+	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;	//ÔøΩÔøΩ—°ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩŒ≤Èø¥ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
 	fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
 	
 	if(ioctl(cam_fd, VIDIOC_S_FMT, &fmt) == -1){
@@ -72,7 +72,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 	}
 	printf("Current data format information:\n\twidth:%d\theight:%d\n\n",fmt.fmt.pix.width,fmt.fmt.pix.height);
 
-	//∑÷≈‰ƒ⁄¥Ê,…Í«Î“ª∏ˆ”µ”–Àƒ∏ˆª∫≥Â÷°µƒª∫≥Â«¯
+	//ÔøΩÔøΩÔøΩÔøΩÔøΩ⁄¥ÔøΩ,ÔøΩÔøΩÔøΩÔøΩ“ªÔøΩÔøΩ”µÔøΩÔøΩÔøΩƒ∏ÔøΩÔøΩÔøΩÔøΩÔøΩ÷°ÔøΩƒªÔøΩÔøΩÔøΩÔøΩÔøΩ
 	struct v4l2_requestbuffers req;
 	memset(&req, 0, sizeof(req));
 	req.count	= 4;
@@ -83,19 +83,19 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 		return FAILED;
 	}
 
-	//ªÒ»°≤¢º«¬ºª∫¥ÊµƒŒÔ¿Ìø’º‰
-	//buffers = calloc(req.count, sizeof(*buffers));	//¥¥Ω®¡ÀÀƒ∏ˆ¥ÀΩ·ππÃÂµƒø’º‰
+	//ÔøΩÔøΩ»°ÔøΩÔøΩÔøΩÔøΩ¬ºÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ’ºÔøΩ
+	//buffers = calloc(req.count, sizeof(*buffers));	//ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩƒ∏ÔøΩÔøΩÀΩ·ππÔøΩÔøΩƒø’ºÔøΩ
 	
-	//ªÒ»°ª∫≥Â÷°µƒµÿ÷∑°¢≥§∂»
+	//ÔøΩÔøΩ»°ÔøΩÔøΩÔøΩÔøΩ÷°ÔøΩƒµÔøΩ÷∑ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
 	int numBufs;
 	struct v4l2_buffer buf;
-	for(numBufs = 0; numBufs < req.count; numBufs++){	//numBufsŒ¥∂®“Â
+	for(numBufs = 0; numBufs < req.count; numBufs++){	//numBufsŒ¥ÔøΩÔøΩÔøΩÔøΩ
 		memset(&buf, 0, sizeof(buf));
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory = V4L2_MEMORY_MMAP;
 		buf.index = numBufs;
 		
-		//”≥…‰
+		//”≥ÔøΩÔøΩ
 		if(ioctl(cam_fd, VIDIOC_QUERYBUF, &buf) == -1){	
 			return FAILED;
 		}
@@ -110,7 +110,7 @@ int camera_init(const char *devpath, unsigned int *width, unsigned int *height, 
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory = V4L2_MEMORY_MMAP;
 		
-		//∑≈»Îª∫¥Ê∂”¡–
+		//ÔøΩÔøΩÔøΩÎª∫ÔøΩÔøΩÔøΩÔøΩÔøΩ
 		if(ioctl(cam_fd, VIDIOC_QBUF, &buf) == -1){
 			return FAILED;
 		}
@@ -138,7 +138,7 @@ int camera_start(int fd)
 	return SECCESS;
 }
 
-///JPEG–¥»Î2.c
+///JPEG–¥ÔøΩÔøΩ2.c
 int camera_jpeg_gather(char *buffers,int len)
 {
 	FILE *fp;
@@ -189,7 +189,7 @@ void convert_yuv_to_rgb(char *yuv, char *rgb, int width, int height,unsigned int
 //RGB◊™JPEG
 int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned int height, unsigned int bpp, int quality)
 {	
-//RGB◊™JPEG≥ı ºªØ
+//RGB◊™JPEGÔøΩÔøΩ ºÔøΩÔøΩ
 	memset(&jinfo, 0, sizeof(struct jpeg_mgr_info));
 	jinfo.cinfo.err = jpeg_std_error(&jinfo.jerr);
 	jpeg_create_compress(&jinfo.cinfo);
@@ -213,18 +213,18 @@ int convert_rgb_to_jpg_work(char *rgb, char *jpeg, unsigned int width, unsigned 
 		jpeg_write_scanlines(&jinfo.cinfo, jinfo.row_pointer, 1);
 	//	jinfo.cinfo.next_scanline++;
 	}
-//RGB◊™JPEGÕÀ≥ˆ
+//RGB◊™JPEGÔøΩÀ≥ÔøΩ
 	jpeg_finish_compress(&jinfo.cinfo);
 	//EOR
 	return (jinfo.written);
 }
 
-//RGB◊™BMP–¥»Î3.bmp
+//RGB◊™BMP–¥ÔøΩÔøΩ3.bmp
 void savebmp(char * pdata, char * bmp_file, int width, int height )  
 {   
-	//∑÷±Œ™rgb ˝æ›£¨“™±£¥ÊµƒbmpŒƒº˛√˚£¨Õº∆¨≥§øÌ  
-       int size = width*height*3*sizeof(char); // √ø∏ˆœÒÀÿµ„3∏ˆ◊÷Ω⁄  
-       // ŒªÕºµ⁄“ª≤ø∑÷£¨Œƒº˛–≈œ¢  
+	//ÔøΩ÷±ÔøΩŒ™rgbÔøΩÔøΩÔøΩ›£ÔøΩ“™ÔøΩÔøΩÔøΩÔøΩÔøΩbmpÔøΩƒºÔøΩÔøΩÔøΩÔøΩÔøΩÕº∆¨ÔøΩÔøΩÔøΩÔøΩ  
+       int size = width*height*3*sizeof(char); // √øÔøΩÔøΩÔøΩÔøΩÔøΩÿµÔøΩ3ÔøΩÔøΩÔøΩ÷ΩÔøΩ  
+       // ŒªÕºÔøΩÔøΩ“ªÔøΩÔøΩÔøΩ÷£ÔøΩÔøΩƒºÔøΩÔøΩÔøΩœ¢  
        BMPFILEHEADER_T bfh;  
        bfh.bfType = (WORD)0x4d42;  //bm  
        bfh.bfSize = size  // data size  
@@ -233,28 +233,28 @@ void savebmp(char * pdata, char * bmp_file, int width, int height )
               ;  
        bfh.bfReserved1 = 0; // reserved  
        bfh.bfReserved2 = 0; // reserved  
-       bfh.bfOffBits = sizeof( BMPFILEHEADER_T )+ sizeof( BMPINFOHEADER_T );//’Ê’˝µƒ ˝æ›µƒŒª÷√  
+       bfh.bfOffBits = sizeof( BMPFILEHEADER_T )+ sizeof( BMPINFOHEADER_T );//ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ›µÔøΩŒªÔøΩÔøΩ  
   
-       // ŒªÕºµ⁄∂˛≤ø∑÷£¨ ˝æ›–≈œ¢  
+       // ŒªÕºÔøΩ⁄∂ÔøΩÔøΩÔøΩÔøΩ÷£ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩœ¢  
        BMPINFOHEADER_T bih;  
        bih.biSize = sizeof(BMPINFOHEADER_T);  
        bih.biWidth = width;  
-       bih.biHeight = -height;//BMPÕº∆¨¥”◊Ó∫Û“ª∏ˆµ„ø™ º…®√Ë£¨œ‘ æ ±Õº∆¨ «µπ◊≈µƒ£¨À˘“‘”√-height£¨’‚—˘Õº∆¨æÕ’˝¡À  
-       bih.biPlanes = 1;//Œ™1£¨≤ª”√∏ƒ  
+       bih.biHeight = -height;//BMPÕº∆¨ÔøΩÔøΩÔøΩÔøΩÔøΩ“ªÔøΩÔøΩÔøΩ„ø™ º…®ÔøΩË£¨ÔøΩÔøΩ æ ±Õº∆¨ÔøΩ«µÔøΩÔøΩ≈µƒ£ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ-heightÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÕº∆¨ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ  
+       bih.biPlanes = 1;//Œ™1ÔøΩÔøΩÔøΩÔøΩÔøΩ√∏ÔøΩ  
        bih.biBitCount = 24;  
-       bih.biCompression = 0;//≤ª—πÀı  
+       bih.biCompression = 0;//ÔøΩÔøΩ—πÔøΩÔøΩ  
        bih.biSizeImage = size;  
-       bih.biXPelsPerMeter = 2835 ;//œÒÀÿ√ø√◊  
+       bih.biXPelsPerMeter = 2835 ;//ÔøΩÔøΩÔøΩÔøΩ√øÔøΩÔøΩ  
        bih.biYPelsPerMeter = 2835 ;  
-       bih.biClrUsed = 0;//“—”√π˝µƒ—’…´£¨24ŒªµƒŒ™0  
-       bih.biClrImportant = 0;//√ø∏ˆœÒÀÿ∂º÷ÿ“™  
+       bih.biClrUsed = 0;//ÔøΩÔøΩÔøΩ√πÔøΩÔøΩÔøΩÔøΩÔøΩ…´ÔøΩÔøΩ24ŒªÔøΩÔøΩŒ™0  
+       bih.biClrImportant = 0;//√øÔøΩÔøΩÔøΩÔøΩÔøΩÿ∂ÔøΩÔøΩÔøΩ“™  
        FILE * fp = fopen( bmp_file,"wb" );  
        if( !fp ){
 		   perror("bmp_file");
 		   return ;
 	   }
   
-       fwrite( &bfh, 8, 1,  fp );//”…”⁄linux…œ4◊÷Ω⁄∂‘∆Î£¨∂¯–≈œ¢Õ∑¥Û–°Œ™54◊÷Ω⁄£¨µ⁄“ª≤ø∑÷14◊÷Ω⁄£¨µ⁄∂˛≤ø∑÷40◊÷Ω⁄£¨À˘“‘ª·Ω´µ⁄“ª≤ø∑÷≤π∆ÎŒ™16◊‘º∫£¨÷±Ω””√sizeof£¨¥Úø™Õº∆¨ ±æÕª·”ˆµΩpremature end-of-file encountered¥ÌŒÛ  
+       fwrite( &bfh, 8, 1,  fp );//ÔøΩÔøΩÔøΩÔøΩlinuxÔøΩÔøΩ4ÔøΩ÷Ω⁄∂ÔøΩÔøΩÎ£¨ÔøΩÔøΩÔøΩÔøΩœ¢Õ∑ÔøΩÔøΩ–°Œ™54ÔøΩ÷Ω⁄£ÔøΩÔøΩÔøΩ“ªÔøΩÔøΩÔøΩÔøΩ14ÔøΩ÷Ω⁄£ÔøΩÔøΩ⁄∂ÔøΩÔøΩÔøΩÔøΩÔøΩ40ÔøΩ÷Ω⁄£ÔøΩÔøΩÔøΩÔøΩ‘ª·Ω´ÔøΩÔøΩ“ªÔøΩÔøΩÔøΩ÷≤ÔøΩÔøΩÔøΩŒ™16ÔøΩ‘ºÔøΩÔøΩÔøΩ÷±ÔøΩÔøΩÔøΩÔøΩsizeofÔøΩÔøΩÔøΩÔøΩÕº∆¨ ±ÔøΩÕªÔøΩÔøΩÔøΩÔøΩÔøΩpremature end-of-file encounteredÔøΩÔøΩÔøΩÔøΩ  
        fwrite(&bfh.bfReserved2, sizeof(bfh.bfReserved2), 1, fp);  
        fwrite(&bfh.bfOffBits, sizeof(bfh.bfOffBits), 1, fp);  
        fwrite( &bih, sizeof(BMPINFOHEADER_T),1,fp );  
@@ -264,7 +264,7 @@ void savebmp(char * pdata, char * bmp_file, int width, int height )
 } 
 
 	/*
-	// ”∆µ ‰»Î…Ë÷√
+	//ÔøΩÔøΩ∆µÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
 	struct v412_input input;
 	ioctl(cam_fd, VIDIOC_S_INPUT, &input);
 	*/
@@ -274,7 +274,7 @@ void *camera_run(void *arg)
     struct v4l2_buffer buf;
     int ret;
     unsigned int width = WIDTH;
-    unsigned int height = HIGHT;
+    unsigned int height = HEIGHT;
     int size;
     jpeg_buffers jpeg_buf;
 
@@ -310,10 +310,10 @@ void *camera_run(void *arg)
             pthread_exit(NULL);
         }
 
-        convert_yuv_to_rgb(buffers->start, rgb_buf.buf, WIDTH, HIGHT, 24);//RGBËΩ¨Êç¢
+        convert_yuv_to_rgb(buffers->start, rgb_buf.buf, WIDTH, HEIGHT, 24);//RGBËΩ¨Êç¢
         rgb_buf.length=strlen(rgb_buf.buf);
 
-        jpeg_buf.length = convert_rgb_to_jpg_work(rgb_buf.buf,jpeg_buf.buf,WIDTH,HIGHT,24,100);
+        jpeg_buf.length = convert_rgb_to_jpg_work(rgb_buf.buf,jpeg_buf.buf,WIDTH,HEIGHT,24,100);
 
 
         if( jpeg_buf.length < 2000 )

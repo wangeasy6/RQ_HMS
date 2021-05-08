@@ -1,5 +1,7 @@
 #include "main.h"
+
 SHARED g_data;
+
 static int data_init()
 {
 	int i;
@@ -12,7 +14,7 @@ int main(){
 	
 	//uint8 send_pic[250*1024]={0};
 	unsigned int width = WIDTH;
-	unsigned int height = HIGHT;
+	unsigned int height = HEIGHT;
 	int size;
 
 	if( !( data_init() && dht11_init() && infrared_init() && \
